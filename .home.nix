@@ -72,12 +72,29 @@ in {
     haruna
     gitnr
     calibre
+    firefox
     libreoffice
     hunspell
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
     yt-dlp
+    sirikali
+    flameshot
+    qbittorrent
+    openrgb
+    rclone
+    picom
+    dunst
+    blueman
+    kitty
+    feh
+    polybarFull
+    lxqt.lxqt-policykit
+    autorandr
+    unstable.indicator-sound-switcher
+    steam
+    networkmanagerapplet
     mindustry-server
     waydroid
     pavucontrol
@@ -215,7 +232,7 @@ in {
           "${mod}+d" = "layout toggle split";
 
           # open powermenu
-          "${mod}+Backspace" = "mode \"powermenu\"";
+          "${mod}+BackSpace" = "mode \"powermenu\"";
 
           # reload config
           "${mod}+Shift+c" = "reload";
@@ -257,7 +274,7 @@ in {
             # back to normal: Enter, Escape, or Backspace
             "Return" = "mode \"default\"";
             "Escape" = "mode \"default\"";
-            "Backspace" = "mode \"default\"";
+            "BackSpace" = "mode \"default\"";
           };
         };
 
