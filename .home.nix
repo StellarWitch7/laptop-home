@@ -171,7 +171,7 @@ in {
 
           # launch programs
           "${mod}+Return" = "exec ${term}";
-          "${mod}+Space" = "exec --no-startup-id ${menu}";
+          "${mod}+space" = "exec --no-startup-id ${menu}";
           "${mod}+c" = "exec ${browser}";
 
           # screenshot
