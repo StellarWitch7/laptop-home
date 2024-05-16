@@ -142,8 +142,8 @@ in {
         startup = with pkgs; [
           { command = "${autorandr.out}/bin/autorandr -c"; always = true; notification = false; }
           { command = "${feh.out}/bin/feh --no-fehbg --bg-scale $HOME/.bg"; always = true; notification = false; }
-          { command = "${pbar-start.out}/bin/launch"; always = true; notification = false; } # not always?
-          { command = "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; } # nixefy this
+          { command = "${pbar-start.out}/bin/launch"; always = true; notification = false; }
+          { command = "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; }
           { command = "${picom.out}/bin/picom -cbf --config ~/.config/picom/picom.conf"; always = false; notification = false; }
           { command = "${openrgb.out}/bin/openrgb --startminimized"; always = false; notification = false; }
           { command = "${dunst.out}/bin/dunst"; always = false; notification = false; }
@@ -308,13 +308,17 @@ in {
     enable = true;
 
     bashrcExtra = ''
-      . ~/.bashrc.mine
-    '';
+      # If not running interactively, don't do anything
+      [[ $- != *i* ]] && return
 
-    profileExtra = ''
-      . ~/.profile.mine
+      # If root, don't do anything
+      [[ "$(whoami)" = "root" ]] && return
 
-      export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/share:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share
+      # Start starship
+      eval "$(${pkgs.starship.out}/bin/starship init bash)"
+
+      # Source the rest of bashrc
+      source ~/.bashrc.mine
     '';
   };
 
@@ -323,10 +327,6 @@ in {
 
     enableSshSupport = true;
     defaultCacheTtl = 1800;
-  };
-
-  programs.waybar = {
-    enable = true;
   };
 
   gtk = {
@@ -354,14 +354,12 @@ in {
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
-    ".face".source = /home/aur/dotfiles/.face;
-    ".bg".source = /home/aur/dotfiles/.bg;
+    #".config/dosomething/config.toml".source = /path/to/dosomething/config.toml;
 
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
+    #".gradle/gradle.properties".text = ''
+    #  org.gradle.console=verbose
+    #  org.gradle.daemon.idletimeout=3600000
+    #'';
   };
 
   # Home Manager can also manage your environment variables through
@@ -391,6 +389,8 @@ in {
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_DATA_HOME = "$HOME/.local/share";
     XDG_STATE_HOME = "$HOME/.local/state";
+
+    XDG_DATA_DIRS = "$XDG_DATA_DIRS:/usr/share:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
   };
