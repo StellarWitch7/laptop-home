@@ -2,14 +2,18 @@
 
 let
   aurpkgs = import (fetchTarball https://github.com/StellarWitch7/nurpkgs/archive/master.tar.gz) { };
-  browser = config.home.sessionVariables.BROWSER;
+  editor = "${pkgs.nano.out}/bin/nano";
+  browser = "${pkgs.firefox.out}/bin/firefox";
   screenshotter = "${pkgs.flameshot.out}/bin/flameshot";
   screenshot-gui = "${screenshotter} gui";
   screenshot-full = "${screenshotter} full";
   lock = "${i3-lock.out}/bin/i3-lock-blurred";
+  sswitcher = with pkgs; writeShellScriptBin "sswitcher" ''
+    exec nix-shell -p indicator-sound-switcher --run indicator-sound-switcher
+  '';
   pbar-start = with pkgs; writeShellScriptBin "launch" ''
     ${polybarFull.out}/bin/polybar-msg cmd quit
-    ${polybarFull.out}/bin/polybar
+    exec ${polybarFull.out}/bin/polybar
   '';
   i3-lock = with pkgs; writeShellScriptBin "i3-lock-blurred" ''
     img=/tmp/i3lock.png
@@ -34,7 +38,7 @@ in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "aur";
-  home.homeDirectory = "/home/aur";
+  home.homeDirectory = "/home/${config.home.username}";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -50,6 +54,7 @@ in {
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    sswitcher
     aurpkgs.moth-lang
     aurpkgs.vault
     aurpkgs.nixbrains
@@ -58,11 +63,14 @@ in {
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
     '')
+    (writeShellScriptBin "cs-fmt" ''
+      nix-shell -p dotnet-sdk csharpier --run "dotnet-csharpier $@"
+    '')
     (writeShellScriptBin "hotspot" ''
       pkexec --user root ${linux-wifi-hotspot.out}/bin/create_ap wlp0s20f3 wlp0s20f3 "solanix" "$1" --mkconfig /etc/create_ap.conf -g 1.1.1.1
     '')
     (writeShellScriptBin "hotspot-gui" ''
-      ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
+      exec ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
     '')
     bottom
     octave
@@ -82,17 +90,18 @@ in {
     sirikali
     flameshot
     qbittorrent
+    soundux
     openrgb
     rclone
     picom
     dunst
     blueman
     kitty
+    linux-wifi-hotspot
     feh
     polybarFull
     lxqt.lxqt-policykit
     autorandr
-    unstable.indicator-sound-switcher
     steam
     networkmanagerapplet
     mindustry-server
@@ -115,7 +124,6 @@ in {
     #spicetify-cli
     #spotdl
     gnome.file-roller
-    gnome.nautilus
     nano
     freshfetch
     bruno
@@ -124,10 +132,9 @@ in {
     vscode
     xed-editor
     gnome.ghex
-    gnome.gnome-disk-utility
     krita
     ffmpeg
-    nautilus-open-any-terminal
+    xfce.thunar
     tmux
     unstable.jetbrains.rust-rover
     jetbrains.rider
@@ -162,14 +169,14 @@ in {
           { command = "${pbar-start.out}/bin/launch"; always = true; notification = false; }
           { command = "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; }
           { command = "${picom.out}/bin/picom -cbf --config ~/.config/picom/picom.conf"; always = false; notification = false; }
-          { command = "${openrgb.out}/bin/openrgb --startminimized"; always = false; notification = false; }
+          { command = "${openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\""; always = false; notification = false; }
           { command = "${dunst.out}/bin/dunst"; always = false; notification = false; }
           { command = "${flameshot.out}/bin/flameshot"; always = false; notification = false; }
           { command = "${networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
           { command = "${sirikali.out}/bin/sirikali"; always = false; notification = false; }
           { command = "${qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
           { command = "${blueman.out}/bin/blueman-applet"; always = false; notification = false; }
-          { command = "${unstable.indicator-sound-switcher.out}/bin/indicator-sound-switcher"; always = false; notification = false; }
+          { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
           { command = "${steam.out}/bin/steam"; always = false; notification = false; }
           { command = "${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive"; always = false; notification = false; }
         ];
@@ -197,6 +204,9 @@ in {
 
           # lock screen
           "${mod}+l" = "exec --no-startup-id ${lock}";
+
+          # reload monitor config with autorandr
+          "${mod}+x" = "exec --no-startup-id autorandr -c";
 
           # modify audio settings
           "XF86AudioRaiseVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%";
@@ -394,10 +404,10 @@ in {
     GAMES = "$HOME/Games";
     APPS = "$HOME/Apps";
 
-    PATH = "$PATH:$HOME/.bin:$GAMES:$HOME/.cargo/bin:$HOME/.nix-profile/bin:$HOME/.spicetify:/var/lib/snapd/snap/bin";
+    PATH = "$PATH:$HOME/.bin:$GAMES:$HOME/.cargo/bin:$HOME/.nix-profile/bin:$HOME/.spicetify:/var/lib/snapd/snap/bin:$HOME/.dotnet/tools";
 
-    EDITOR = "nano";
-    BROWSER = "firefox";
+    EDITOR = "${editor}";
+    BROWSER = "${browser}";
 
     HISTCONTROL = "ignoredups:ignorespace";
     HISTTIMEFORMAT = "[%Y/%m/%d @ %H:%M:%S] ";
