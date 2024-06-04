@@ -5,6 +5,7 @@
 #!*/
 
 # Don't ignore the following
+!README.md
 !.gitignore
 !.face
 !.bg
