@@ -118,6 +118,7 @@ in {
     catppuccin-papirus-folders
     playonlinux
     lutris
+    nix-output-monitor
     unstable.invidtui
     xclip
     glances

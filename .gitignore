@@ -1,12 +1,13 @@
 # Ignore everything
 *
 
-# Don't ignore directories, so we can recurse into them
-#!*/
+# Don't ignore the following directories
+!.bin/
 
-# Don't ignore the following
+# Don't ignore the following files
 !README.md
 !.gitignore
 !.face
 !.bg
 !*.nix
+!*.sh
