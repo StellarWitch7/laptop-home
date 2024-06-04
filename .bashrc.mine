@@ -18,7 +18,10 @@ alias schp="xclip <~/Documents/school_pass.zip"
 alias miniarch="~/connect aurora nova711.asuscomm.com"
 alias update-clean="sys-switch && switch && home-clean && sys-clean"
 
+alias nix-shell="nix-shell --log-format bar-with-logs"
+alias nix-build="nix-build --log-format bar-with-logs"
+alias nix-store="nix-store --log-format bar-with-logs"
+alias nixos-rebuild="nixos-rebuild --log-format bar-with-logs"
+
 export CHROOT=$HOME/chroot
 export GPG_TTY=$(tty)
-
-nix-shell 2>/dev/null

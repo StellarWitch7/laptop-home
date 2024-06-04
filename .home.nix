@@ -53,12 +53,13 @@ in {
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = with pkgs; [
+  home.packages = with pkgs; with nur.repos; [
     sswitcher
     aurpkgs.moth-lang
     aurpkgs.vault
     aurpkgs.nixbrains
     aurpkgs.ImageSorter
+    aurpkgs.playit
     (writeShellScriptBin "recon-gdrive" ''
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
@@ -72,6 +73,7 @@ in {
     (writeShellScriptBin "hotspot-gui" ''
       exec ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
     '')
+    #kampka.nixify # no longer available?
     bottom
     octave
     xplr
@@ -103,6 +105,10 @@ in {
     lxqt.lxqt-policykit
     autorandr
     steam
+    unzip
+    ngrok
+    tailscale-systray
+    riseup-vpn
     networkmanagerapplet
     mindustry-server
     waydroid
@@ -147,7 +153,6 @@ in {
     enable = true;
 
     numlock.enable = true;
-
 
     windowManager.i3 = {
       enable = true;
@@ -195,7 +200,7 @@ in {
 
           # launch programs
           "${mod}+Return" = "exec ${term}";
-          "${mod}+space" = "exec --no-startup-id ${menu}";
+          "${mod}+space" = "exec ${menu}";
           "${mod}+c" = "exec ${browser}";
 
           # screenshot
@@ -341,17 +346,110 @@ in {
       # If root, don't do anything
       [[ "$(whoami)" = "root" ]] && return
 
-      # Start starship
-      eval "$(${pkgs.starship.out}/bin/starship init bash)"
-
       # Source the rest of bashrc
       source ~/.bashrc.mine
     '';
   };
 
+  programs.starship = {
+    enable = true;
+    enableBashIntegration = true;
+
+    settings = {
+      add_newline = true;
+      scan_timeout = 10;
+      #palette = "catppuccin_macchiato";
+
+      format = lib.concatStrings [
+        "$username"
+        "$directory"
+        "$sudo"
+        "$battery"
+        "$memory_usage"
+        "$all"
+        "$character"
+      ];
+
+      sudo = { disabled = false; style = "bold red"; symbol = "sudo "; };
+      time = { disabled = true; format = "[\\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
+      status = { disabled = true; style = "violet"; symbol = "🔴 "; success_symbol = "🟢 SUCCESS"; format = "[\\[$symbol$common_meaning$signal_name$maybe_int\\]]($style) "; map_symbol = true; };
+      battery = { disabled = false; display = [ { threshold = 50; } ]; };
+      memory_usage = { disabled = false; };
+
+      palettes = {
+        catppuccin_macchiato = {
+          rosewater = "#f4dbd6";
+          flamingo = "#f0c6c6";
+          pink = "#f5bde6";
+          mauve = "#c6a0f6";
+          red = "#ed8796";
+          maroon = "#ee99a0";
+          peach = "#f5a97f";
+          yellow = "#eed49f";
+          green = "#a6da95";
+          teal = "#8bd5ca";
+          sky = "#91d7e3";
+          sapphire = "#7dc4e4";
+          blue = "#8aadf4";
+          lavender = "#b7bdf8";
+          text = "#cad3f5";
+          subtext1 = "#b8c0e0";
+          subtext0 = "#a5adcb";
+          overlay2 = "#939ab7";
+          overlay1 = "#8087a2";
+          overlay0 = "#6e738d";
+          surface2 = "#5b6078";
+          surface1 = "#494d64";
+          surface0 = "#363a4f";
+          base = "#24273a";
+          mantle = "#1e2030";
+          crust = "#181926";
+        };
+
+        catppuccin_mocha = {
+          rosewater = "#f5e0dc";
+          flamingo = "#f2cdcd";
+          pink = "#f5c2e7";
+          mauve = "#cba6f7";
+          red = "#f38ba8";
+          maroon = "#eba0ac";
+          peach = "#fab387";
+          yellow = "#f9e2af";
+          green = "#a6e3a1";
+          teal = "#94e2d5";
+          sky = "#89dceb";
+          sapphire = "#74c7ec";
+          blue = "#89b4fa";
+          lavender = "#b4befe";
+          text = "#cdd6f4";
+          subtext1 = "#bac2de";
+          subtext0 = "#a6adc8";
+          overlay2 = "#9399b2";
+          overlay1 = "#7f849c";
+          overlay0 = "#6c7086";
+          surface2 = "#585b70";
+          surface1 = "#45475a";
+          surface0 = "#313244";
+          base = "#1e1e2e";
+          mantle = "#181825";
+          crust = "#11111b";
+        };
+      };
+    };
+  };
+
+  programs.direnv = {
+    enable = true;
+    enableBashIntegration = true;
+    nix-direnv.enable = true;
+  };
+
+  services.ssh-agent = {
+    enable = true;
+  };
+
   services.gpg-agent = {
     enable = true;
-
     enableSshSupport = true;
     defaultCacheTtl = 1800;
   };
@@ -364,7 +462,7 @@ in {
       package = pkgs.catppuccin-gtk.override {
         accents = [ "mauve" ];
         size = "standard";
-        tweaks = [ "rimless" ];
+        #tweaks = [ "rimless" ];
         variant = "mocha";
       };
     };
@@ -404,7 +502,7 @@ in {
     GAMES = "$HOME/Games";
     APPS = "$HOME/Apps";
 
-    PATH = "$PATH:$HOME/.bin:$GAMES:$HOME/.cargo/bin:$HOME/.nix-profile/bin:$HOME/.spicetify:/var/lib/snapd/snap/bin:$HOME/.dotnet/tools";
+    PATH = "$PATH:$HOME/.bin:$GAMES:$APPS:$HOME/.cargo/bin:$HOME/.nix-profile/bin:$HOME/.spicetify:/var/lib/snapd/snap/bin:$HOME/.dotnet/tools";
 
     EDITOR = "${editor}";
     BROWSER = "${browser}";
