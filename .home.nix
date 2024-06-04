@@ -346,8 +346,26 @@ in {
       # If root, don't do anything
       [[ "$(whoami)" = "root" ]] && return
 
-      # Source the rest of bashrc
-      source ~/.bashrc.mine
+      # limits recursive functions, see 'man bash'
+      [[ -z "$FUNCNEST" ]] && export FUNCNEST=100
+
+      ## Use the up and down arrow keys for finding a command in history
+      ## (you can write some initial letters of the command first).
+      bind '"\e[A":history-search-backward'
+      bind '"\e[B":history-search-forward'
+
+      alias ls='ls -lav --color=auto --ignore=..'
+      alias l='ls -lav --color=auto --ignore=.. | grep '
+      alias pacdiff=eos-pacdiff
+      alias invidtui="invidtui --close-instances"
+      alias schp="xclip <~/Documents/school_pass.zip"
+      alias miniarch="~/connect aurora nova711.asuscomm.com"
+      alias update-clean="sys-switch && switch && home-clean && sys-clean"
+
+      alias nix-shell="nix-shell --log-format bar-with-logs"
+      alias nix-build="nix-build --log-format bar-with-logs"
+      alias nix-store="nix-store --log-format bar-with-logs"
+      alias nixos-rebuild="nixos-rebuild --log-format bar-with-logs"
     '';
   };
 
@@ -518,5 +536,9 @@ in {
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/usr/share:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
+
+    ALL_NULL = "1>/dev/null 2>&1";
+    OUT_NULL = "1>/dev/null";
+    ERR_NULL = "2>/dev/null";
   };
 }

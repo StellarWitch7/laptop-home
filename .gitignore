@@ -2,7 +2,7 @@
 *
 
 # Don't ignore directories, so we can recurse into them
-!*/
+#!*/
 
 # Don't ignore the following
 !.gitignore
