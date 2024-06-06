@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 cd ~/RiderProjects/moth-lang
-code ~/VSCodeProjects/moth.code-workspace &
-nix-shell --run rider
+export NIXPKGS_ALLOW_UNFREE=1
+nix-shell -p vscode jetbrains.rider --run "code ~/VSCodeProjects/moth.code-workspace &
+  rider ./moth-lang.sln"

@@ -85,6 +85,7 @@ in {
     firefox
     libreoffice
     hunspell
+    tree
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
@@ -107,6 +108,7 @@ in {
     autorandr
     steam
     unzip
+    with-shell
     ngrok
     tailscale-systray
     riseup-vpn
@@ -386,7 +388,6 @@ in {
       #palette = "catppuccin_macchiato";
 
       format = lib.concatStrings [
-        "$username"
         "$directory"
         "$sudo"
         "$git_branch"
@@ -399,7 +400,6 @@ in {
         "$rust"
         "$python"
         "$fill"
-        #"$direnv"
         "$memory_usage"
         "$battery"
         "$time"
@@ -407,12 +407,20 @@ in {
         "$character"
       ];
 
-      sudo = { disabled = false; style = "bold red"; symbol = "sudo "; };
+      directory = { disabled = false; format = "[$path]($style)[$read_only]($read_only_style)"; };
+      sudo = { disabled = false; format = " as [$sudo]($style)"; symbol = "sudo"; style = "bold red"; };
       time = { disabled = false; format = "[\\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
-      status = { disabled = true; style = "violet"; symbol = "🔴 "; success_symbol = "🟢 SUCCESS"; format = "[\\[$symbol$common_meaning$signal_name$maybe_int\\]]($style) "; map_symbol = true; };
       battery = { disabled = false; display = [ { threshold = 75; } ]; };
-      memory_usage = { disabled = false; format = "with [$ram( | $swap)]($style) RAM "; threshold = 50; };
-      nix_shell = { disabled = false; format = "via [$state shell( \\($name\\))]($style) "; };
+      memory_usage = { disabled = false; format = " with [$ram( | $swap)]($style) RAM"; threshold = 50; };
+      nix_shell = { disabled = false; format = " in [$state $name]($style)"; };
+      git_branch = { disabled = false; format = " on [$symbol$branch(:$remote_branch)]($style)"; };
+      git_commit = { disabled = false; format = " [\\($hash$tag\\)]($style)"; };
+      git_state = { disabled = false; format = " \\([$state( $progress_current/$progress_total)]($style)\\)"; };
+      git_metrics = { disabled = false; format = "([ +$added]($added_style))([ -$deleted]($deleted_style))"; };
+      git_status = { disabled = false; format = " ([\\[$all_status$ahead_behind\\]]($style))"; };
+      dotnet = { disabled = false; format = " via [$symbol$version]($style)"; version_format = "v$major"; };
+      rust = { disabled = false; format = " via [$symbol$version]($style)"; };
+      python = { disabled = false; format = " via [$symbol$pyenv_prefix $version \\($virtualenv\\)]($style)"; };
       fill = { symbol = " "; };
 
       palettes = {
