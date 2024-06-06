@@ -99,6 +99,7 @@ in {
     dunst
     blueman
     kitty
+    kitti3
     linux-wifi-hotspot
     feh
     polybarFull
@@ -117,7 +118,7 @@ in {
     catppuccin-cursors
     catppuccin-papirus-folders
     playonlinux
-    lutris
+    unstable.lutris
     nix-output-monitor
     unstable.invidtui
     xclip
@@ -142,6 +143,7 @@ in {
     krita
     ffmpeg
     xfce.thunar
+    xfce.thunar-archive-plugin
     tmux
     unstable.jetbrains.rust-rover
     jetbrains.rider
@@ -177,6 +179,7 @@ in {
           { command = "${picom.out}/bin/picom -cbf --config ~/.config/picom/picom.conf"; always = false; notification = false; }
           { command = "${openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\""; always = false; notification = false; }
           { command = "${dunst.out}/bin/dunst"; always = false; notification = false; }
+          { command = "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4"; always = true; notification = false; }
           { command = "${flameshot.out}/bin/flameshot"; always = false; notification = false; }
           { command = "${networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
           { command = "${sirikali.out}/bin/sirikali"; always = false; notification = false; }
@@ -204,6 +207,9 @@ in {
           "${mod}+space" = "exec ${menu}";
           "${mod}+c" = "exec ${browser}";
 
+          # pop-up kitty
+          "${mod}+x" = "nop caterwaul";
+
           # screenshot
           "Print" = "exec --no-startup-id ${screenshot-full}";
           "${mod}+Print" = "exec --no-startup-id ${screenshot-gui}";
@@ -212,7 +218,7 @@ in {
           "${mod}+l" = "exec --no-startup-id ${lock}";
 
           # reload monitor config with autorandr
-          "${mod}+x" = "exec --no-startup-id autorandr -c";
+          "${mod}+z" = "exec --no-startup-id autorandr -c";
 
           # modify audio settings
           "XF86AudioRaiseVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%";
@@ -383,17 +389,31 @@ in {
         "$username"
         "$directory"
         "$sudo"
-        "$battery"
+        "$git_branch"
+        "$git_commit"
+        "$git_state"
+        "$git_metrics"
+        "$git_status"
+        "$nix_shell"
+        "$dotnet"
+        "$rust"
+        "$python"
+        "$fill"
+        #"$direnv"
         "$memory_usage"
-        "$all"
+        "$battery"
+        "$time"
+        "$line_break"
         "$character"
       ];
 
       sudo = { disabled = false; style = "bold red"; symbol = "sudo "; };
-      time = { disabled = true; format = "[\\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
+      time = { disabled = false; format = "[\\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
       status = { disabled = true; style = "violet"; symbol = "🔴 "; success_symbol = "🟢 SUCCESS"; format = "[\\[$symbol$common_meaning$signal_name$maybe_int\\]]($style) "; map_symbol = true; };
-      battery = { disabled = false; display = [ { threshold = 50; } ]; };
-      memory_usage = { disabled = false; };
+      battery = { disabled = false; display = [ { threshold = 75; } ]; };
+      memory_usage = { disabled = false; format = "with [$ram( | $swap)]($style) RAM "; threshold = 50; };
+      nix_shell = { disabled = false; format = "via [$state shell( \\($name\\))]($style) "; };
+      fill = { symbol = " "; };
 
       palettes = {
         catppuccin_macchiato = {
