@@ -100,7 +100,6 @@ in {
     dunst
     blueman
     kitty
-    kitti3
     linux-wifi-hotspot
     feh
     polybarFull
@@ -408,16 +407,16 @@ in {
       ];
 
       directory = { disabled = false; format = "[$path]($style)[$read_only]($read_only_style)"; };
-      sudo = { disabled = false; format = " as [$sudo]($style)"; symbol = "sudo"; style = "bold red"; };
+      sudo = { disabled = false; format = " as [sudo]($style)"; style = "bold red"; };
       time = { disabled = false; format = "[\\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
       battery = { disabled = false; display = [ { threshold = 75; } ]; };
       memory_usage = { disabled = false; format = " with [$ram( | $swap)]($style) RAM"; threshold = 50; };
       nix_shell = { disabled = false; format = " in [$state $name]($style)"; };
       git_branch = { disabled = false; format = " on [$symbol$branch(:$remote_branch)]($style)"; };
-      git_commit = { disabled = false; format = " [\\($hash$tag\\)]($style)"; };
-      git_state = { disabled = false; format = " \\([$state( $progress_current/$progress_total)]($style)\\)"; };
+      git_commit = { disabled = false; format = "[ \\($hash$tag\\)]($style)"; };
+      git_state = { disabled = false; format = "\\([ $state($progress_current/$progress_total)]($style)\\)"; };
       git_metrics = { disabled = false; format = "([ +$added]($added_style))([ -$deleted]($deleted_style))"; };
-      git_status = { disabled = false; format = " ([\\[$all_status$ahead_behind\\]]($style))"; };
+      git_status = { disabled = false; format = "([ \\[$all_status$ahead_behind\\]]($style))"; };
       dotnet = { disabled = false; format = " via [$symbol$version]($style)"; version_format = "v$major"; };
       rust = { disabled = false; format = " via [$symbol$version]($style)"; };
       python = { disabled = false; format = " via [$symbol$pyenv_prefix $version \\($virtualenv\\)]($style)"; };
