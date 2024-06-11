@@ -408,7 +408,7 @@ in {
 
       directory = { disabled = false; format = "[$path]($style)[$read_only]($read_only_style)"; };
       sudo = { disabled = false; format = " as [sudo]($style)"; style = "bold red"; };
-      time = { disabled = false; format = "[ \\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-5"; };
+      time = { disabled = false; format = "[ \\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-4"; };
       battery = { disabled = false; display = [ { threshold = 75; } ]; };
       memory_usage = { disabled = false; format = " [$ram RAM( | $swap SWAP)]($style)"; threshold = 50; };
       nix_shell = { disabled = false; format = " in [$state $name]($style)"; };
