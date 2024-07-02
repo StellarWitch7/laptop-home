@@ -73,23 +73,29 @@ in {
     (writeShellScriptBin "hotspot-gui" ''
       exec ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
     '')
-    #kampka.nixify # no longer available?
-    bottom
+    #(unstable.discord.override { withVencord = true; withOpenASAR = true; }) # broken
+    unstable.vesktop
     octave
     xplr
     firefox
     vlc
+    audacity
     haruna
     gitnr
     calibre
+    simplescreenrecorder
     firefox
+    neovim
     libreoffice
     hunspell
     tree
+    #obsidian
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
     yt-dlp
+    #kampka.nixify # no longer available?
+    bottom
     sirikali
     flameshot
     qbittorrent
@@ -97,6 +103,7 @@ in {
     openrgb
     rclone
     picom
+    bespokesynth
     dunst
     blueman
     kitty
@@ -126,7 +133,6 @@ in {
     glances
     keepassxc
     hyfetch
-    unstable.vesktop
     starship
     #spotify
     #spotifywm
@@ -184,6 +190,7 @@ in {
           { command = "${flameshot.out}/bin/flameshot"; always = false; notification = false; }
           { command = "${networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
           { command = "${sirikali.out}/bin/sirikali"; always = false; notification = false; }
+          { command = "${keepassxc.out}/bin/keepassxc"; always = false; notification = false; }
           { command = "${qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
           { command = "${blueman.out}/bin/blueman-applet"; always = false; notification = false; }
           { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
@@ -247,7 +254,6 @@ in {
 
           # fullscreen
           "${mod}+f" = "fullscreen toggle";
-          "F11" = "fullscreen toggle";
 
           # change layout
           "${mod}+a" = "layout stacking";
@@ -488,6 +494,23 @@ in {
     enable = true;
     enableBashIntegration = true;
     nix-direnv.enable = true;
+  };
+
+  programs.git = {
+    includes = [
+      {
+        contents = {
+          commit.gpgsign = true;
+          gpg.format = "ssh";
+
+          user = {
+            name = "Aurora Dawn";
+            email = "131844170+StellarWitch7@users.noreply.github.com";
+            signingKey = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDa9q/hF/Ign0phm5I1ZZ+ZX3Xe2yk8OqNYOX4R8gWpMR6CctkrIoBAzriaTk4GAUpy1A0C450uAMiveEcuyMBZrO+eP9gHbSvauFcqkeA/xtm5rqyCKyFAoUpUcKfHQ/ZQWhCIA5taC9WbqPblLXIunZOgEaxRuc922GCMsp+p33dR1sAVrq2QyYQAZZEk53M1rOT1gtDCUyGnsdY7Huiuxlum+oeUWRGogkViww2FfGO4uGj0qbOHUKL5mrFewXZ3VqlIqxAh6p7cqEZV8jgGfprI4Tv6QRaCKKEGfRjZ66dIolRIDtZwoxyAxUf716ZqMHNCGhNRtnUYClDMIFh76K6EAAtuyCEmXoMOSKVrfzLVfXQD1K/DaqDnOjhz5digl1l8elLUdBmpa050u9/3j4XC8wOGljqJRNfsZQg112A/BVjoR+Iz+VAWHvcxRnK7+ZpEzX3CN14PAYsnNcZ4uXjsFeJDbPkUZFIt1y/3vdbahPKk7239wnDNiy4cjr8xsTeeMgeYHR6AY+NRRhpBADLpSaz9YI86xLcQXqM8GieWTWAHMLQfKda3c7Bjw8e6xgBMWxkNfPMBKb6bVxWEnb5gFarXLXLTLkKFf9LY02mNA1wdjP3IkbXHc1T7OXPIl9JIBvuEnCPq9TS4JgRPhtLUGKzlsj1knWUWOyVIGw== 131844170+StellarWitch7@users.noreply.github.com";
+          };
+        };
+      }
+    ];
   };
 
   services.ssh-agent = {
