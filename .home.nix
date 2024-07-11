@@ -61,7 +61,7 @@ in {
     aurpkgs.ImageSorter
     aurpkgs.playit
     (writeShellScriptBin "recon-gdrive" ''
-      ${rclone.out}/bin/rclone config reconnect AuraGDrive:
+      printf "\n\n\n\n" | ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
     '')
     (writeShellScriptBin "cs-fmt" ''
@@ -78,6 +78,7 @@ in {
     octave
     xplr
     firefox
+    handbrake
     vlc
     audacity
     haruna
@@ -90,6 +91,8 @@ in {
     hunspell
     tree
     #obsidian
+    aseprite #pikopixel
+    blockbench
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
@@ -99,7 +102,7 @@ in {
     sirikali
     flameshot
     qbittorrent
-    soundux
+    #soundux # unmaintained
     openrgb
     rclone
     picom
@@ -153,10 +156,10 @@ in {
     xfce.thunar-archive-plugin
     tmux
     unstable.jetbrains.rust-rover
-    jetbrains.rider
-    jetbrains.idea-ultimate
-    jetbrains.clion
-    jetbrains.pycharm-professional
+    unstable.jetbrains.rider
+    unstable.jetbrains.idea-ultimate
+    unstable.jetbrains.clion
+    unstable.jetbrains.pycharm-professional
   ];
 
   xsession = {
@@ -521,6 +524,22 @@ in {
     enable = true;
     enableSshSupport = true;
     defaultCacheTtl = 1800;
+  };
+
+  systemd.user.services = {
+    clean = {
+      Unit = {
+        Description = "Clean user Nix store.";
+      };
+
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+
+      Service = {
+        ExecStart = "${aurpkgs.easy-nixos.out}/bin/home-clean";
+      };
+    };
   };
 
   gtk = {
