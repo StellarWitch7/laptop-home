@@ -56,6 +56,7 @@ in {
   home.packages = with pkgs; with nur.repos; [
     sswitcher
     aurpkgs.moth-lang
+    aurpkgs.git-nixed
     aurpkgs.vault
     aurpkgs.nixbrains
     aurpkgs.ImageSorter
@@ -113,6 +114,7 @@ in {
     linux-wifi-hotspot
     feh
     polybarFull
+    prismlauncher
     lxqt.lxqt-policykit
     autorandr
     steam
@@ -546,7 +548,7 @@ in {
     enable = true;
 
     theme = {
-      name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+      name = "Catppuccin-Mocha-Standard-Mauve-dark";
       package = pkgs.catppuccin-gtk.override {
         accents = [ "mauve" ];
         size = "standard";
