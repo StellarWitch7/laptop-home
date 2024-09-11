@@ -34,11 +34,14 @@ let
     # resume message display
     pkill -u "$USER" -USR2 dunst
   '';
-in {
+  name = "aur";
+  dir = "/home/${name}";
+  hconf = "${dir}/.hconf";
+in rec {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "aur";
-  home.homeDirectory = "/home/${config.home.username}";
+  home.username = name;
+  home.homeDirectory = dir;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -49,7 +52,10 @@ in {
   # release notes.
   home.stateVersion = "23.11"; # Please read the comment before changing.
 
-  imports = [ /etc/nixos/default-home.nix ];
+  imports = [
+    /etc/nixos/default-home.nix
+    "${fetchTarball https://github.com/catppuccin/nix/archive/main.tar.gz}/modules/home-manager"
+  ];
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -59,10 +65,11 @@ in {
     aurpkgs.git-nixed
     aurpkgs.vault
     aurpkgs.nixbrains
+    aurpkgs.bar # fun game :D
     aurpkgs.ImageSorter
-    aurpkgs.playit
+    #aurpkgs.playit
     (writeShellScriptBin "recon-gdrive" ''
-      printf "\n\n\n\n" | ${rclone.out}/bin/rclone config reconnect AuraGDrive:
+      ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
     '')
     (writeShellScriptBin "cs-fmt" ''
@@ -82,10 +89,11 @@ in {
     handbrake
     vlc
     audacity
-    haruna
+    #haruna
     gitnr
     calibre
     simplescreenrecorder
+    freetube
     firefox
     neovim
     libreoffice
@@ -113,23 +121,18 @@ in {
     kitty
     linux-wifi-hotspot
     feh
-    polybarFull
     prismlauncher
     lxqt.lxqt-policykit
     autorandr
-    steam
     unzip
     with-shell
     ngrok
     tailscale-systray
-    riseup-vpn
+    #riseup-vpn
     networkmanagerapplet
     mindustry-server
-    waydroid
+    #waydroid
     pavucontrol
-    catppuccin
-    catppuccin-cursors
-    catppuccin-papirus-folders
     playonlinux
     unstable.lutris
     nix-output-monitor
@@ -154,8 +157,6 @@ in {
     gnome.ghex
     krita
     ffmpeg
-    xfce.thunar
-    xfce.thunar-archive-plugin
     tmux
     unstable.jetbrains.rust-rover
     unstable.jetbrains.rider
@@ -199,7 +200,7 @@ in {
           { command = "${qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
           { command = "${blueman.out}/bin/blueman-applet"; always = false; notification = false; }
           { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
-          { command = "${steam.out}/bin/steam"; always = false; notification = false; }
+#          { command = "${steam.out}/bin/steam"; always = false; notification = false; }
           { command = "${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive"; always = false; notification = false; }
         ];
 
@@ -395,7 +396,6 @@ in {
     settings = {
       add_newline = true;
       scan_timeout = 10;
-      #palette = "catppuccin_macchiato";
 
       format = lib.concatStrings [
         "$directory"
@@ -432,66 +432,6 @@ in {
       rust = { disabled = false; format = " via [$symbol$version]($style)"; };
       python = { disabled = false; format = " via [$symbol$pyenv_prefix $version \\($virtualenv\\)]($style)"; };
       fill = { symbol = " "; };
-
-      palettes = {
-        catppuccin_macchiato = {
-          rosewater = "#f4dbd6";
-          flamingo = "#f0c6c6";
-          pink = "#f5bde6";
-          mauve = "#c6a0f6";
-          red = "#ed8796";
-          maroon = "#ee99a0";
-          peach = "#f5a97f";
-          yellow = "#eed49f";
-          green = "#a6da95";
-          teal = "#8bd5ca";
-          sky = "#91d7e3";
-          sapphire = "#7dc4e4";
-          blue = "#8aadf4";
-          lavender = "#b7bdf8";
-          text = "#cad3f5";
-          subtext1 = "#b8c0e0";
-          subtext0 = "#a5adcb";
-          overlay2 = "#939ab7";
-          overlay1 = "#8087a2";
-          overlay0 = "#6e738d";
-          surface2 = "#5b6078";
-          surface1 = "#494d64";
-          surface0 = "#363a4f";
-          base = "#24273a";
-          mantle = "#1e2030";
-          crust = "#181926";
-        };
-
-        catppuccin_mocha = {
-          rosewater = "#f5e0dc";
-          flamingo = "#f2cdcd";
-          pink = "#f5c2e7";
-          mauve = "#cba6f7";
-          red = "#f38ba8";
-          maroon = "#eba0ac";
-          peach = "#fab387";
-          yellow = "#f9e2af";
-          green = "#a6e3a1";
-          teal = "#94e2d5";
-          sky = "#89dceb";
-          sapphire = "#74c7ec";
-          blue = "#89b4fa";
-          lavender = "#b4befe";
-          text = "#cdd6f4";
-          subtext1 = "#bac2de";
-          subtext0 = "#a6adc8";
-          overlay2 = "#9399b2";
-          overlay1 = "#7f849c";
-          overlay0 = "#6c7086";
-          surface2 = "#585b70";
-          surface1 = "#45475a";
-          surface0 = "#313244";
-          base = "#1e1e2e";
-          mantle = "#181825";
-          crust = "#11111b";
-        };
-      };
     };
   };
 
@@ -528,6 +468,24 @@ in {
     defaultCacheTtl = 1800;
   };
 
+  services.polybar = {
+    enable = true;
+    catppuccin.enable = true;
+
+    package = pkgs.polybarFull;
+
+    config = "${hconf}/polybar/config.ini";
+
+    script = ''
+      ${pbar-start.out}/bin/launch
+    '';
+  };
+
+  services.dunst = {
+    enable = true;
+    catppuccin.enable = true;
+  };
+
   systemd.user.services = {
     clean = {
       Unit = {
@@ -544,17 +502,21 @@ in {
     };
   };
 
+  programs.rofi = {
+    enable = true;
+    catppuccin.enable = true;
+  };
+
+  catppuccin = {
+    flavor = "mocha";
+    accent = "mauve";
+  };
+
   gtk = {
     enable = true;
-
-    theme = {
-      name = "Catppuccin-Mocha-Standard-Mauve-dark";
-      package = pkgs.catppuccin-gtk.override {
-        accents = [ "mauve" ];
-        size = "standard";
-        #tweaks = [ "rimless" ];
-        variant = "mocha";
-      };
+    catppuccin = {
+      enable = true;
+      icon.enable = true;
     };
 
     cursorTheme = {

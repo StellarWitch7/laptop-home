@@ -3,6 +3,9 @@
 
 # Don't ignore the following directories
 !.bin/
+!.bin/**
+!.hconf/
+!.hconf/**
 
 # Don't ignore the following files
 !README.md
@@ -11,3 +14,4 @@
 !.bg
 !*.nix
 !*.sh
+
