@@ -2,7 +2,7 @@
 
 let
   aurpkgs = import (fetchTarball https://github.com/StellarWitch7/nurpkgs/archive/master.tar.gz) { };
-  editor = "${pkgs.nano.out}/bin/nano";
+  editor = "${pkgs.micro.out}/bin/micro";
   browser = "${pkgs.firefox.out}/bin/firefox";
   screenshotter = "${pkgs.flameshot.out}/bin/flameshot";
   screenshot-gui = "${screenshotter} gui";
@@ -37,6 +37,10 @@ let
   name = "aur";
   dir = "/home/${name}";
   hconf = "${dir}/.hconf";
+  catppuccin = {
+    flavor = "mocha";
+    accent = "mauve";
+  };
 in rec {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -51,6 +55,8 @@ in rec {
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "23.11"; # Please read the comment before changing.
+
+  inherit catppuccin;
 
   imports = [
     /etc/nixos/default-home.nix
@@ -147,6 +153,7 @@ in rec {
     #spicetify-cli
     #spotdl
     gnome.file-roller
+    micro # silly editor, very silly
     nano
     freshfetch
     bruno
@@ -382,6 +389,9 @@ in rec {
       alias miniarch="~/connect aurora nova711.asuscomm.com"
       alias update-clean="sys-switch && switch && home-clean && sys-clean"
 
+      # Trying this out
+      alias nano="micro"
+
       alias nix-shell="nix-shell --log-format bar-with-logs"
       alias nix-build="nix-build --log-format bar-with-logs"
       alias nix-store="nix-store --log-format bar-with-logs"
@@ -505,11 +515,6 @@ in rec {
   programs.rofi = {
     enable = true;
     catppuccin.enable = true;
-  };
-
-  catppuccin = {
-    flavor = "mocha";
-    accent = "mauve";
   };
 
   gtk = {
