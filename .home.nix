@@ -87,6 +87,12 @@ in rec {
     (writeShellScriptBin "hotspot-gui" ''
       exec ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
     '')
+    (writeShellScriptBin "remindme" ''
+      time="$1"
+      text="$2"
+      
+      echo "notify-send --category reminder 'Reminder' '$text'" | at now + "$time"
+    '')
     #(unstable.discord.override { withVencord = true; withOpenASAR = true; }) # broken
     unstable.vesktop
     octave
@@ -487,13 +493,22 @@ in rec {
     config = "${hconf}/polybar/config.ini";
 
     script = ''
-      ${pbar-start.out}/bin/launch
+      # ${pbar-start.out}/bin/launch
     '';
   };
 
   services.dunst = {
     enable = true;
     catppuccin.enable = true;
+
+    settings = {
+      remindme = {
+      	category = "reminder";
+        background = "#333333";
+        foreground = "#ff7f7f";
+        timeout = 0;
+      };
+    };
   };
 
   systemd.user.services = {
@@ -575,9 +590,5 @@ in rec {
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/usr/share:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
-
-    ALL_NULL = "1>/dev/null 2>&1";
-    OUT_NULL = "1>/dev/null";
-    ERR_NULL = "2>/dev/null";
   };
 }
