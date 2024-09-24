@@ -2,7 +2,7 @@
 
 let
   aurpkgs = import (fetchTarball https://github.com/StellarWitch7/nurpkgs/archive/master.tar.gz) { };
-  editor = "${pkgs.micro.out}/bin/micro";
+  editor = "nvim";
   browser = "${pkgs.firefox.out}/bin/firefox";
   screenshotter = "${pkgs.flameshot.out}/bin/flameshot";
   screenshot-gui = "${screenshotter} gui";
@@ -37,10 +37,6 @@ let
   name = "aur";
   dir = "/home/${name}";
   hconf = "${dir}/.hconf";
-  catppuccin = {
-    flavor = "mocha";
-    accent = "mauve";
-  };
 in rec {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -56,24 +52,32 @@ in rec {
   # release notes.
   home.stateVersion = "23.11"; # Please read the comment before changing.
 
-  inherit catppuccin;
+  catppuccin = {
+    flavor = "mocha";
+    accent = "mauve";
+  };
 
   imports = [
     /etc/nixos/default-home.nix
-    "${fetchTarball https://github.com/catppuccin/nix/archive/main.tar.gz}/modules/home-manager"
+    "${fetchTarball https://github.com/catppuccin/nix/archive/main.tar.gz}/modules/home-manager" # ignore LSP
+    (import (builtins.fetchGit {
+      url = "https://github.com/nix-community/nixvim";
+    })).homeManagerModules.nixvim
   ];
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = with pkgs; with nur.repos; [
+  home.packages = [
     sswitcher
-    aurpkgs.moth-lang
-    aurpkgs.git-nixed
-    aurpkgs.vault
-    aurpkgs.nixbrains
-    aurpkgs.bar # fun game :D
-    aurpkgs.ImageSorter
-    #aurpkgs.playit
+  ] ++ (with aurpkgs; [
+    git-nixed
+    vault
+    nixbrains
+    bar # fun game :D
+    ImageSorter
+    #moth-lang
+    #playit
+  ]) ++ (with pkgs; [
     (writeShellScriptBin "recon-gdrive" ''
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
@@ -104,10 +108,10 @@ in rec {
     #haruna
     gitnr
     calibre
+    zathura
     simplescreenrecorder
     freetube
     firefox
-    neovim
     libreoffice
     hunspell
     tree
@@ -137,6 +141,7 @@ in rec {
     lxqt.lxqt-policykit
     autorandr
     unzip
+    obs-studio
     with-shell
     ngrok
     tailscale-systray
@@ -171,12 +176,12 @@ in rec {
     krita
     ffmpeg
     tmux
-    unstable.jetbrains.rust-rover
-    unstable.jetbrains.rider
-    unstable.jetbrains.idea-ultimate
-    unstable.jetbrains.clion
-    unstable.jetbrains.pycharm-professional
-  ];
+    #unstable.jetbrains.rust-rover
+    #unstable.jetbrains.rider
+    #unstable.jetbrains.idea-ultimate
+    #unstable.jetbrains.clion
+    #unstable.jetbrains.pycharm-professional
+  ]);
 
   xsession = {
     enable = true;
@@ -187,7 +192,7 @@ in rec {
       enable = true;
 
       extraConfig = ''
-        include ~/.config/i3/i3-catppuccin
+        include ${hconf}/i3/i3-catppuccin
       '';
 
       config = {
@@ -213,7 +218,6 @@ in rec {
           { command = "${qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
           { command = "${blueman.out}/bin/blueman-applet"; always = false; notification = false; }
           { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
-#          { command = "${steam.out}/bin/steam"; always = false; notification = false; }
           { command = "${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive"; always = false; notification = false; }
         ];
 
@@ -457,6 +461,12 @@ in rec {
     nix-direnv.enable = true;
   };
 
+  programs.rofi = {
+    enable = true;
+    catppuccin.enable = true;
+    terminal = "${pkgs.kitty.out}/bin/kitty";
+  };
+
   programs.git = {
     includes = [
       {
@@ -472,6 +482,100 @@ in rec {
         };
       }
     ];
+  };
+
+  programs.nixvim = {
+    enable = true;
+
+    opts = {
+      number = true;
+      relativenumber = true;
+      expandtab = true;
+      shiftwidth = 4;
+      tabstop = 4;
+    };
+
+    globals = {
+      mapleader = " ";
+    };
+
+    keymaps = [
+      {
+        key = "<leader>g";
+        action = "<cmd>Oil";
+      }
+    ];
+
+    extraPlugins = with pkgs.vimPlugins; [
+      # nothing to put here yet
+    ];
+
+    plugins = {
+      lazy.enable = true;
+      nix.enable = true;
+      oil.enable = true;
+      todo-comments.enable = true;
+      toggleterm.enable = true;
+      #treesitter.enable = true;
+      refactoring.enable = true;
+      scope.enable = true;
+      which-key.enable = true;
+      #nvim-surround.enable = true;
+      hex.enable = true;
+      gitignore.enable = true;
+      compiler.enable = true;
+      autoclose.enable = true;
+
+      #obsidian.enable = true; # needs more config
+      
+      lsp = {
+        enable = true;
+
+        servers = {
+          nixd = {
+            enable = true;
+            rootDir = { __raw = "function() require('jdtls.setup').find_root({'.git', 'default.nix'}) end"; };
+          };
+
+          kotlin-language-server = {
+            enable = true;
+            rootDir = { __raw = "function() require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'}) end"; };
+          };
+        };
+      };
+
+      coq-nvim = {
+        enable = true;
+        installArtifacts = true;
+
+        settings = {
+          xdg = true;
+          auto_start = "shut-up";
+        };
+      };
+
+      nvim-jdtls = {
+        enable = true;
+        configuration = "${dir}/.config/jdtls/config";
+        data = { __raw = ''os.getenv "HOME" .. "/.local/share/jdtls/workspace/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")''; };
+        rootDir = { __raw = "require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'})"; };
+      };
+
+      packer = {
+        enable = true;
+
+        plugins = [
+          {
+            name = "fhill2/xplr.nvim";
+            run = { __raw = "function() require'xplr'.install({hide=true}) end"; };
+            requires = [
+              "nvim-lua/plenary.nvim"
+              "MunifTanjim/nui.nvim"
+            ];
+          }
+        ];
+      };
+    };
   };
 
   services.ssh-agent = {
@@ -503,7 +607,7 @@ in rec {
 
     settings = {
       remindme = {
-      	category = "reminder";
+        category = "reminder";
         background = "#333333";
         foreground = "#ff7f7f";
         timeout = 0;
@@ -525,11 +629,6 @@ in rec {
         ExecStart = "${aurpkgs.easy-nixos.out}/bin/home-clean";
       };
     };
-  };
-
-  programs.rofi = {
-    enable = true;
-    catppuccin.enable = true;
   };
 
   gtk = {
