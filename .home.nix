@@ -7,10 +7,10 @@ let
   editor = "nvim";
   browser = "firefox";
   terminal = "${pkgs.kitty.out}/bin/kitty";
+  lock = "${i3-lock.out}/bin/i3-lock-blurred";
   screenshotter = "${pkgs.flameshot.out}/bin/flameshot";
   screenshot-gui = "${screenshotter} gui";
   screenshot-full = "${screenshotter} full";
-  lock = "${i3-lock.out}/bin/i3-lock-blurred";
   sswitcher = pkgs.writeShellScriptBin "sswitcher" ''
     exec nix-shell -p indicator-sound-switcher --run indicator-sound-switcher
   '';
@@ -77,11 +77,8 @@ in {
   ] ++ (with aurpkgs; [
     git-nixed
     vault
-    nixbrains # deprecate
-    bar # fun game :D
+    bar
     ImageSorter
-    #moth-lang
-    #playit
   ]) ++ (with pkgs; [
     (writeShellScriptBin "recon-gdrive" ''
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
@@ -102,7 +99,6 @@ in {
       
       echo "notify-send --category reminder 'Reminder' '$text'" | at now + "$time"
     '')
-    #(unstable.discord.override { withVencord = true; withOpenASAR = true; }) # broken
     unstable.vesktop
     unstable.zed-editor
     octave
@@ -111,7 +107,6 @@ in {
     handbrake
     vlc
     audacity
-    #haruna
     gitnr
     calibre
     zathura
@@ -121,23 +116,20 @@ in {
     libreoffice
     hunspell
     tree
-    #obsidian
     aseprite
     blockbench
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
     yt-dlp
-    #kampka.nixify # no longer available?
     bottom
     sirikali
     flameshot
     qbittorrent
-    #soundux # unmaintained
     openrgb
     rclone
-    picom
     bespokesynth
+    picom
     dunst
     blueman
     kitty
@@ -149,37 +141,24 @@ in {
     unzip
     obs-studio
     with-shell
-    ngrok
-    tailscale-systray
-    #riseup-vpn
     networkmanagerapplet
     mindustry-server
-    #waydroid
     pavucontrol
-    playonlinux
-    unstable.lutris
     nix-output-monitor
     unstable.invidtui
     xclip
     glances
     keepassxc
     hyfetch
-    starship
-    #spotify
-    #spotifywm
-    #spicetify-cli
-    #spotdl
     gnome.file-roller
-    micro # silly editor, very silly
     bruno
-    nanorc
     kitty-themes
-    vscode
     xed-editor
     gnome.ghex
     krita
     ffmpeg
-    tmux
+    #obsidian
+    #vscode
     #unstable.jetbrains.rust-rover
     #unstable.jetbrains.rider
     #unstable.jetbrains.idea-ultimate
@@ -191,186 +170,8 @@ in {
     enable = true;
     numlock.enable = true;
 
-    windowManager.i3 = {
-      enable = true;
-
-      extraConfig = ''
-        include ${hconf + /i3/i3-catppuccin}
-      '';
-
-      config = rec {
-        modifier = "Mod4";
-        inherit terminal;
-        menu = "${pkgs.rofi.out}/bin/rofi -show drun -run-command \"i3-msg exec '{cmd}'\" -show-icons";
-        defaultWorkspace = "workspace number 1";
-        #workspaceLayout = "tabbed";
-
-        startup = [
-          { command = "${pkgs.autorandr.out}/bin/autorandr -c"; always = true; notification = false; }
-          { command = "${pkgs.feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg"; always = true; notification = false; }
-          { command = "${pbar-start.out}/bin/launch"; always = true; notification = false; }
-          { command = "${pkgs.lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; }
-          { command = "${pkgs.picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}"; always = false; notification = false; }
-          { command = "${pkgs.openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\""; always = false; notification = false; }
-          { command = "${pkgs.dunst.out}/bin/dunst"; always = false; notification = false; }
-          { command = "${pkgs.kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4"; always = true; notification = false; }
-          { command = "${pkgs.flameshot.out}/bin/flameshot"; always = false; notification = false; }
-          { command = "${pkgs.networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
-          { command = "${pkgs.sirikali.out}/bin/sirikali"; always = false; notification = false; }
-          { command = "${pkgs.keepassxc.out}/bin/keepassxc"; always = false; notification = false; }
-          { command = "${pkgs.qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
-          { command = "${pkgs.blueman.out}/bin/blueman-applet"; always = false; notification = false; }
-          { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
-          { command = "${pkgs.rclone.out}/bin/rclone mount AuraGDrive: ${dir}/CloudData/AuraGDrive"; always = false; notification = false; }
-        ];
-
-        keybindings = let
-          mod = modifier;
-          wspace_key = "${mod}+Mod2+KP";
-          wspace_mv_key = "${mod}+Mod1+Mod2+KP";
-          wspace_cmd = "workspace number";
-          wspace_mv_cmd = "move container to workspace number";
-        in {
-          # kill windows
-          "${mod}+Delete" = "kill";
-
-          # launch programs
-          "${mod}+Return" = "exec ${terminal}";
-          "${mod}+space" = "exec ${menu}";
-          "${mod}+c" = "exec ${browser}";
-
-          # pop-up kitty
-          "${mod}+x" = "nop caterwaul";
-
-          # screenshot
-          "Print" = "exec --no-startup-id ${screenshot-full}";
-          "${mod}+Print" = "exec --no-startup-id ${screenshot-gui}";
-
-          # lock screen
-          "${mod}+l" = "exec --no-startup-id ${lock}";
-
-          # reload monitor config with autorandr
-          "${mod}+z" = "exec --no-startup-id autorandr -c";
-
-          # modify audio settings
-          "XF86AudioRaiseVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%";
-          "XF86AudioLowerVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%";
-          "XF86AudioMute" = "exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle";
-          "XF86AudioMicMute" = "exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle";
-
-          # change focus
-          "${mod}+Left" = "focus left";
-          "${mod}+Down" = "focus down";
-          "${mod}+Right" = "focus right";
-          "${mod}+Up" = "focus up";
-
-          # move window
-          "${mod}+Mod1+Left" = "move left";
-          "${mod}+Mod1+Down" = "move down";
-          "${mod}+Mod1+Right" = "move right";
-          "${mod}+Mod1+Up" = "move up";
-
-          # split horizontal
-          "${mod}+h" = "split h";
-
-          # split vertical
-          "${mod}+v" = "split v";
-
-          # fullscreen
-          "${mod}+f" = "fullscreen toggle";
-
-          # change layout
-          "${mod}+a" = "layout stacking";
-          "${mod}+s" = "layout tabbed";
-          "${mod}+d" = "layout toggle split";
-
-          # open powermenu
-          "${mod}+BackSpace" = "mode \"powermenu\"";
-
-          # reload config
-          "${mod}+Shift+c" = "reload";
-
-          # restart i3 inplace
-          "${mod}+Shift+r" = "restart";
-
-          # switch to workspace
-          "${wspace_key}_1" = "${wspace_cmd} 1";
-          "${wspace_key}_2" = "${wspace_cmd} 2";
-          "${wspace_key}_3" = "${wspace_cmd} 3";
-          "${wspace_key}_4" = "${wspace_cmd} 4";
-          "${wspace_key}_5" = "${wspace_cmd} 5";
-          "${wspace_key}_6" = "${wspace_cmd} 6";
-          "${wspace_key}_7" = "${wspace_cmd} 7";
-          "${wspace_key}_8" = "${wspace_cmd} 8";
-          "${wspace_key}_9" = "${wspace_cmd} 9";
-
-          # move window to workspace
-          "${wspace_mv_key}_1" = "${wspace_mv_cmd} 1";
-          "${wspace_mv_key}_2" = "${wspace_mv_cmd} 2";
-          "${wspace_mv_key}_3" = "${wspace_mv_cmd} 3";
-          "${wspace_mv_key}_4" = "${wspace_mv_cmd} 4";
-          "${wspace_mv_key}_5" = "${wspace_mv_cmd} 5";
-          "${wspace_mv_key}_6" = "${wspace_mv_cmd} 6";
-          "${wspace_mv_key}_7" = "${wspace_mv_cmd} 7";
-          "${wspace_mv_key}_8" = "${wspace_mv_cmd} 8";
-          "${wspace_mv_key}_9" = "${wspace_mv_cmd} 9";
-        };
-
-        modes = {
-          powermenu = {
-            "l" = "exec --no-startup-id ${lock}, mode \"default\"";
-            "e" = "exec --no-startup-id i3-msg exit, mode \"default\"";
-            "h" = "exec --no-startup-id ${lock} && systemctl hibernate, mode \"default\"";
-            "r" = "exec --no-startup-id systemctl reboot, mode \"default\"";
-            "s" = "exec --no-startup-id systemctl poweroff -i, mode \"default\"";
-
-            # back to normal: Enter, Escape, or Backspace
-            "Return" = "mode \"default\"";
-            "Escape" = "mode \"default\"";
-            "BackSpace" = "mode \"default\"";
-          };
-        };
-
-        floating = {
-          titlebar = true;
-          border = 2;
-          inherit modifier;
-        };
-
-        focus = {
-          followMouse = true;
-          mouseWarping = true;
-        };
-
-        window = {
-          titlebar = false;
-          border = 2;
-
-          commands = [
-            {
-              command = "kill";
-
-              criteria = {
-                class = ".blueman-applet-wrapped";
-              };
-            }
-          ];
-        };
-
-        gaps = {
-          smartBorders = "on";
-          inner = 6;
-          outer = 2;
-        };
-
-        fonts = {
-          names = [ "pango" ];
-          style = "monospace";
-          size = 8.0;
-        };
-
-        bars = lib.mkForce [ ];
-      };
+    windowManager.i3 = import (hconf + /i3) {
+      inherit lib pkgs dir hconf lock terminal browser sswitcher pbar-start screenshot-full screenshot-gui;
     };
   };
 
@@ -407,51 +208,7 @@ in {
     '';
   };
 
-  programs.starship = {
-    enable = true;
-    enableBashIntegration = true;
-
-    settings = {
-      add_newline = true;
-      scan_timeout = 10;
-
-      format = lib.concatStrings [
-        "$directory"
-        "$sudo"
-        "$git_branch"
-        "$git_commit"
-        "$git_state"
-        "$git_metrics"
-        "$git_status"
-        "$nix_shell"
-        "$dotnet"
-        "$rust"
-        "$python"
-        "$fill"
-        "$memory_usage"
-        "$battery"
-        "$time"
-        "$line_break"
-        "$character"
-      ];
-
-      directory = { disabled = false; format = "[$path]($style)[$read_only]($read_only_style)"; };
-      sudo = { disabled = false; format = " as [sudo]($style)"; style = "bold red"; };
-      time = { disabled = false; format = "[ \\[ $time \\]]($style)"; time_format = "%T"; utc_time_offset = "-4"; };
-      battery = { disabled = false; display = [ { threshold = 75; } ]; };
-      memory_usage = { disabled = false; format = " [$ram RAM( | $swap SWAP)]($style)"; threshold = 50; };
-      nix_shell = { disabled = false; format = " in [$state $name]($style)"; };
-      git_branch = { disabled = false; format = " on [$symbol$branch(:$remote_branch)]($style)"; };
-      git_commit = { disabled = false; format = "[ \\($hash$tag\\)]($style)"; };
-      git_state = { disabled = false; format = "\\([ $state($progress_current/$progress_total)]($style)\\)"; };
-      git_metrics = { disabled = false; format = "([ +$added]($added_style))([ -$deleted]($deleted_style))"; };
-      git_status = { disabled = false; format = "([ \\[$all_status$ahead_behind\\]]($style))"; };
-      dotnet = { disabled = false; format = " via [$symbol$version]($style)"; version_format = "v$major"; };
-      rust = { disabled = false; format = " via [$symbol$version]($style)"; };
-      python = { disabled = false; format = " via [$symbol$pyenv_prefix $version \\($virtualenv\\)]($style)"; };
-      fill = { symbol = " "; };
-    };
-  };
+  programs.starship = import (hconf + /starship) { };
 
   programs.direnv = {
     enable = true;
@@ -502,11 +259,11 @@ in {
     keymaps = [
       {
         key = "<leader>g";
-        action = "<cmd>Oil";
+        action = "<cmd>Oil<CR>";
       }
       {
         key = "<leader>b";
-        action = "<cmd>ToggleTerm";
+        action = "<cmd>ToggleTerm<CR>";
       }
     ];
 
@@ -523,13 +280,14 @@ in {
       refactoring.enable = true;
       scope.enable = true;
       which-key.enable = true;
-      # one of these doesn't work
-      #treesitter.enable = true;
-      #nvim-surround.enable = true;
       hex.enable = true;
       gitignore.enable = true;
       compiler.enable = true;
       autoclose.enable = true;
+
+      # one of these doesn't work
+      #treesitter.enable = true;
+      #nvim-surround.enable = true;
 
       #obsidian.enable = true; # needs more config
       
@@ -539,12 +297,10 @@ in {
         servers = {
           nixd = {
             enable = true;
-            rootDir = mkRaw "function() require('jdtls.setup').find_root({'.git', 'default.nix'}) end";
           };
 
           kotlin-language-server = {
             enable = true;
-            rootDir = mkRaw "function() require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'}) end";
           };
         };
       };
@@ -572,7 +328,7 @@ in {
         plugins = [
           {
             name = "fhill2/xplr.nvim";
-            run = mkRaw "function() require'xplr'.install({hide=true}) end";
+            run = mkRaw "function() require('xplr').install({hide=true}) end";
             requires = [
               "nvim-lua/plenary.nvim"
               "MunifTanjim/nui.nvim"
