@@ -1,21 +1,24 @@
 { config, lib, pkgs, ... }:
 
 let
-  aurpkgs = import (fetchTarball https://github.com/StellarWitch7/nurpkgs/archive/master.tar.gz) { };
+  aurpkgs = import (builtins.fetchGit {
+    url = "https://github.com/StellarWitch7/nurpkgs";
+  }) { };
   editor = "nvim";
-  browser = "${pkgs.firefox.out}/bin/firefox";
+  browser = "firefox";
+  terminal = "${pkgs.kitty.out}/bin/kitty";
   screenshotter = "${pkgs.flameshot.out}/bin/flameshot";
   screenshot-gui = "${screenshotter} gui";
   screenshot-full = "${screenshotter} full";
   lock = "${i3-lock.out}/bin/i3-lock-blurred";
-  sswitcher = with pkgs; writeShellScriptBin "sswitcher" ''
+  sswitcher = pkgs.writeShellScriptBin "sswitcher" ''
     exec nix-shell -p indicator-sound-switcher --run indicator-sound-switcher
   '';
-  pbar-start = with pkgs; writeShellScriptBin "launch" ''
-    ${polybarFull.out}/bin/polybar-msg cmd quit
-    exec ${polybarFull.out}/bin/polybar
+  pbar-start = pkgs.writeShellScriptBin "launch" ''
+    ${pkgs.polybarFull.out}/bin/polybar-msg cmd quit
+    exec ${pkgs.polybarFull.out}/bin/polybar
   '';
-  i3-lock = with pkgs; writeShellScriptBin "i3-lock-blurred" ''
+  i3-lock = pkgs.writeShellScriptBin "i3-lock-blurred" ''
     img=/tmp/i3lock.png
 
     # suspend message display
@@ -23,21 +26,21 @@ let
     sleep 1
 
     # take screenshot
-    ${scrot.out}/bin/scrot -o $img
+    ${pkgs.scrot.out}/bin/scrot -o $img
 
     # blur screenshot
-    ${imagemagick.out}/bin/convert $img -scale 10% -scale 1000% $img
+    ${pkgs.imagemagick.out}/bin/convert $img -scale 10% -scale 1000% $img
 
     # lock the screen
-    ${i3lock.out}/bin/i3lock -n -i $img
+    ${pkgs.i3lock.out}/bin/i3lock -n -i $img
 
     # resume message display
     pkill -u "$USER" -USR2 dunst
   '';
   name = "aur";
   dir = "/home/${name}";
-  hconf = "${dir}/.hconf";
-in rec {
+  hconf = /${dir}/.hconf;
+in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = name;
@@ -59,7 +62,9 @@ in rec {
 
   imports = [
     /etc/nixos/default-home.nix
-    "${fetchTarball https://github.com/catppuccin/nix/archive/main.tar.gz}/modules/home-manager" # ignore LSP
+    "${builtins.fetchGit {
+      url = "https://github.com/catppuccin/nix";
+    }}/modules/home-manager"
     (import (builtins.fetchGit {
       url = "https://github.com/nix-community/nixvim";
     })).homeManagerModules.nixvim
@@ -72,7 +77,7 @@ in rec {
   ] ++ (with aurpkgs; [
     git-nixed
     vault
-    nixbrains
+    nixbrains # deprecate
     bar # fun game :D
     ImageSorter
     #moth-lang
@@ -99,6 +104,7 @@ in rec {
     '')
     #(unstable.discord.override { withVencord = true; withOpenASAR = true; }) # broken
     unstable.vesktop
+    unstable.zed-editor
     octave
     xplr
     firefox
@@ -116,7 +122,7 @@ in rec {
     hunspell
     tree
     #obsidian
-    aseprite #pikopixel
+    aseprite
     blockbench
     git
     gitAndTools.gh
@@ -165,8 +171,6 @@ in rec {
     #spotdl
     gnome.file-roller
     micro # silly editor, very silly
-    nano
-    freshfetch
     bruno
     nanorc
     kitty-themes
@@ -185,56 +189,53 @@ in rec {
 
   xsession = {
     enable = true;
-
     numlock.enable = true;
 
     windowManager.i3 = {
       enable = true;
 
       extraConfig = ''
-        include ${hconf}/i3/i3-catppuccin
+        include ${hconf + /i3/i3-catppuccin}
       '';
 
-      config = {
+      config = rec {
         modifier = "Mod4";
-        terminal = "${pkgs.kitty.out}/bin/kitty";
+        inherit terminal;
         menu = "${pkgs.rofi.out}/bin/rofi -show drun -run-command \"i3-msg exec '{cmd}'\" -show-icons";
-        #workspaceLayout = "tabbed";
         defaultWorkspace = "workspace number 1";
+        #workspaceLayout = "tabbed";
 
-        startup = with pkgs; [
-          { command = "${autorandr.out}/bin/autorandr -c"; always = true; notification = false; }
-          { command = "${feh.out}/bin/feh --no-fehbg --bg-scale $HOME/.bg"; always = true; notification = false; }
+        startup = [
+          { command = "${pkgs.autorandr.out}/bin/autorandr -c"; always = true; notification = false; }
+          { command = "${pkgs.feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg"; always = true; notification = false; }
           { command = "${pbar-start.out}/bin/launch"; always = true; notification = false; }
-          { command = "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; }
-          { command = "${picom.out}/bin/picom -cbf --config ~/.config/picom/picom.conf"; always = false; notification = false; }
-          { command = "${openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\""; always = false; notification = false; }
-          { command = "${dunst.out}/bin/dunst"; always = false; notification = false; }
-          { command = "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4"; always = true; notification = false; }
-          { command = "${flameshot.out}/bin/flameshot"; always = false; notification = false; }
-          { command = "${networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
-          { command = "${sirikali.out}/bin/sirikali"; always = false; notification = false; }
-          { command = "${keepassxc.out}/bin/keepassxc"; always = false; notification = false; }
-          { command = "${qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
-          { command = "${blueman.out}/bin/blueman-applet"; always = false; notification = false; }
+          { command = "${pkgs.lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent"; always = false; notification = false; }
+          { command = "${pkgs.picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}"; always = false; notification = false; }
+          { command = "${pkgs.openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\""; always = false; notification = false; }
+          { command = "${pkgs.dunst.out}/bin/dunst"; always = false; notification = false; }
+          { command = "${pkgs.kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4"; always = true; notification = false; }
+          { command = "${pkgs.flameshot.out}/bin/flameshot"; always = false; notification = false; }
+          { command = "${pkgs.networkmanagerapplet.out}/bin/nm-applet"; always = false; notification = false; }
+          { command = "${pkgs.sirikali.out}/bin/sirikali"; always = false; notification = false; }
+          { command = "${pkgs.keepassxc.out}/bin/keepassxc"; always = false; notification = false; }
+          { command = "${pkgs.qbittorrent.out}/bin/qbittorrent"; always = false; notification = false; }
+          { command = "${pkgs.blueman.out}/bin/blueman-applet"; always = false; notification = false; }
           { command = "${sswitcher.out}/bin/sswitcher"; always = false; notification = false; }
-          { command = "${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive"; always = false; notification = false; }
+          { command = "${pkgs.rclone.out}/bin/rclone mount AuraGDrive: ${dir}/CloudData/AuraGDrive"; always = false; notification = false; }
         ];
 
         keybindings = let
-          mod = config.xsession.windowManager.i3.config.modifier;
+          mod = modifier;
           wspace_key = "${mod}+Mod2+KP";
           wspace_mv_key = "${mod}+Mod1+Mod2+KP";
           wspace_cmd = "workspace number";
           wspace_mv_cmd = "move container to workspace number";
-          menu = config.xsession.windowManager.i3.config.menu;
-          term = config.xsession.windowManager.i3.config.terminal;
         in {
           # kill windows
           "${mod}+Delete" = "kill";
 
           # launch programs
-          "${mod}+Return" = "exec ${term}";
+          "${mod}+Return" = "exec ${terminal}";
           "${mod}+space" = "exec ${menu}";
           "${mod}+c" = "exec ${browser}";
 
@@ -333,7 +334,7 @@ in rec {
         floating = {
           titlebar = true;
           border = 2;
-          modifier = "${config.xsession.windowManager.i3.config.modifier}";
+          inherit modifier;
         };
 
         focus = {
@@ -397,10 +398,7 @@ in rec {
       alias invidtui="invidtui --close-instances"
       alias schp="xclip <~/Documents/school_pass.zip"
       alias miniarch="~/connect aurora nova711.asuscomm.com"
-      alias update-clean="sys-switch && switch && home-clean && sys-clean"
-
-      # Trying this out
-      alias nano="micro"
+      alias update-clean="home-clean && sys-clean && sys-switch && switch"
 
       alias nix-shell="nix-shell --log-format bar-with-logs"
       alias nix-build="nix-build --log-format bar-with-logs"
@@ -464,7 +462,7 @@ in rec {
   programs.rofi = {
     enable = true;
     catppuccin.enable = true;
-    terminal = "${pkgs.kitty.out}/bin/kitty";
+    inherit terminal;
   };
 
   programs.git = {
@@ -484,7 +482,9 @@ in rec {
     ];
   };
 
-  programs.nixvim = {
+  programs.nixvim = let
+    mkRaw = config.lib.nixvim.mkRaw;
+  in {
     enable = true;
 
     opts = {
@@ -504,6 +504,10 @@ in rec {
         key = "<leader>g";
         action = "<cmd>Oil";
       }
+      {
+        key = "<leader>b";
+        action = "<cmd>ToggleTerm";
+      }
     ];
 
     extraPlugins = with pkgs.vimPlugins; [
@@ -516,10 +520,11 @@ in rec {
       oil.enable = true;
       todo-comments.enable = true;
       toggleterm.enable = true;
-      #treesitter.enable = true;
       refactoring.enable = true;
       scope.enable = true;
       which-key.enable = true;
+      # one of these doesn't work
+      #treesitter.enable = true;
       #nvim-surround.enable = true;
       hex.enable = true;
       gitignore.enable = true;
@@ -534,12 +539,12 @@ in rec {
         servers = {
           nixd = {
             enable = true;
-            rootDir = { __raw = "function() require('jdtls.setup').find_root({'.git', 'default.nix'}) end"; };
+            rootDir = mkRaw "function() require('jdtls.setup').find_root({'.git', 'default.nix'}) end";
           };
 
           kotlin-language-server = {
             enable = true;
-            rootDir = { __raw = "function() require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'}) end"; };
+            rootDir = mkRaw "function() require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'}) end";
           };
         };
       };
@@ -557,8 +562,8 @@ in rec {
       nvim-jdtls = {
         enable = true;
         configuration = "${dir}/.config/jdtls/config";
-        data = { __raw = ''os.getenv "HOME" .. "/.local/share/jdtls/workspace/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")''; };
-        rootDir = { __raw = "require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'})"; };
+        data = mkRaw "os.getenv \"HOME\" .. \"/.local/share/jdtls/workspace/\" .. vim.fn.fnamemodify(vim.fn.getcwd(), \":p:h:t\")";
+        rootDir = mkRaw "require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'})";
       };
 
       packer = {
@@ -567,7 +572,7 @@ in rec {
         plugins = [
           {
             name = "fhill2/xplr.nvim";
-            run = { __raw = "function() require'xplr'.install({hide=true}) end"; };
+            run = mkRaw "function() require'xplr'.install({hide=true}) end";
             requires = [
               "nvim-lua/plenary.nvim"
               "MunifTanjim/nui.nvim"
@@ -591,14 +596,9 @@ in rec {
   services.polybar = {
     enable = true;
     catppuccin.enable = true;
-
     package = pkgs.polybarFull;
-
-    config = "${hconf}/polybar/config.ini";
-
-    script = ''
-      # ${pbar-start.out}/bin/launch
-    '';
+    config = hconf + /polybar/config.ini;
+    script = "";
   };
 
   services.dunst = {
