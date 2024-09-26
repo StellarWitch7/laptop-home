@@ -47,6 +47,7 @@ in {
     gitignore.enable = true;
     compiler.enable = true;
     autoclose.enable = true;
+    lsp-lines.enable = true;
 
     # one of these doesn't work
     #treesitter.enable = true;
@@ -59,6 +60,32 @@ in {
 
       servers = {
         nixd = {
+          enable = true;
+        };
+
+        rust-analyzer = {
+          enable = true;
+          installCargo = true;
+          installRustc = true;
+
+          settings = {
+            checkOnSave = false;
+          };
+        };
+
+        hls = {
+          enable = true;
+        };
+
+        #bashls = {
+        #  enable = true;
+        #};
+
+        clangd = {
+          enable = true;
+        };
+
+        omnisharp = {
           enable = true;
         };
 
