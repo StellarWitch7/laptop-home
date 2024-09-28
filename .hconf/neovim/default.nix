@@ -28,8 +28,16 @@ in {
       action = "<cmd>XplrPicker %:p:h<CR>";
     }
     {
-      key = "<leader>b";
+      key = "<leader>t";
       action = "<cmd>ToggleTerm<CR>";
+    }
+    {
+      key = "<leader>b";
+      action = "<cmd>BufferPick<CR>";
+    }
+    {
+      key = "<leader>q";
+      action = "<cmd>BufferClose<CR>";
     }
   ];
 
@@ -55,6 +63,7 @@ in {
     scope.enable = true;
     which-key.enable = true;
     hex.enable = true;
+    gitsigns.enable = true;
     gitignore.enable = true;
     compiler.enable = true;
     autoclose.enable = true;
