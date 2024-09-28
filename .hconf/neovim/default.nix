@@ -1,18 +1,21 @@
 { config
-, pkgs
-, dir }:
+, pkgs }:
 
 let
   mkRaw = config.lib.nixvim.mkRaw;
 in {
   enable = true;
+  viAlias = true;
+  vimAlias = true;
 
   opts = {
     number = true;
     relativenumber = true;
     expandtab = true;
+    showmode = false;
     shiftwidth = 4;
     tabstop = 4;
+    clipboard = "unnamedplus";
   };
 
   globals = {
@@ -22,7 +25,7 @@ in {
   keymaps = [
     {
       key = "<leader>g";
-      action = "<cmd>Oil<CR>";
+      action = "<cmd>XplrPicker %:p:h<CR>";
     }
     {
       key = "<leader>b";
@@ -30,14 +33,22 @@ in {
     }
   ];
 
+  colorschemes.catppuccin = {
+    enable = true;
+
+    settings = {
+      flavour = config.catppuccin.flavor;
+    };
+  };
+
   extraPlugins = with pkgs.vimPlugins; [
-    # nothing to put here yet
+    lsp-inlayhints-nvim
+    nvim-lspconfig
   ];
 
   plugins = {
-    lazy.enable = true;
     nix.enable = true;
-    oil.enable = true;
+    #oil.enable = true;
     todo-comments.enable = true;
     toggleterm.enable = true;
     refactoring.enable = true;
@@ -48,6 +59,9 @@ in {
     compiler.enable = true;
     autoclose.enable = true;
     lsp-lines.enable = true;
+    specs.enable = true;
+    barbar.enable = true;
+    web-devicons.enable = true;
 
     # one of these doesn't work
     #treesitter.enable = true;
@@ -57,6 +71,12 @@ in {
     
     lsp = {
       enable = true;
+
+      #TODO: questionable second line
+      onAttach = ''
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+        require("inlay-hints").on_attach(client, bufnr)
+      '';
 
       servers = {
         nixd = {
@@ -77,10 +97,6 @@ in {
           enable = true;
         };
 
-        #bashls = {
-        #  enable = true;
-        #};
-
         clangd = {
           enable = true;
         };
@@ -92,6 +108,14 @@ in {
         kotlin-language-server = {
           enable = true;
         };
+
+        jdt-language-server = {
+          enable = true;
+        };
+
+        #bashls = {
+        #  enable = true;
+        #};
       };
     };
 
@@ -105,11 +129,12 @@ in {
       };
     };
 
-    nvim-jdtls = {
+    lightline = {
       enable = true;
-      configuration = "${dir}/.config/jdtls/config";
-      data = mkRaw "os.getenv \"HOME\" .. \"/.local/share/jdtls/workspace/\" .. vim.fn.fnamemodify(vim.fn.getcwd(), \":p:h:t\")";
-      rootDir = mkRaw "require('jdtls.setup').find_root({'.git', 'build.gradle', 'gradlew'})";
+
+      settings = {
+        colorscheme = "catppuccin";
+      };
     };
 
     packer = {
@@ -117,12 +142,9 @@ in {
 
       plugins = [
         {
-          name = "fhill2/xplr.nvim";
-          run = mkRaw "function() require('xplr').install({hide=true}) end";
-          requires = [
-            "nvim-lua/plenary.nvim"
-            "MunifTanjim/nui.nvim"
-          ];
+          name = "sayanarijit/xplr.vim";
+          event = "VimEnter";
+          config = mkRaw "function() vim.cmd('let g:nnn#replace_netrw = 1') end";
         }
       ];
     };

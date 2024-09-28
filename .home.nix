@@ -126,6 +126,7 @@ in {
     sirikali
     flameshot
     qbittorrent
+    pandoc
     openrgb
     rclone
     bespokesynth
@@ -242,7 +243,7 @@ in {
   };
 
   programs.nixvim = import (hconf + /neovim) {
-    inherit config pkgs dir;
+    inherit config pkgs;
   };
 
   services.ssh-agent = {
