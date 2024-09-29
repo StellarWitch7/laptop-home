@@ -243,7 +243,8 @@ in {
   };
 
   programs.nixvim = import (hconf + /neovim) {
-    inherit config pkgs;
+    inherit config;
+    pkgs = pkgs.unstable;
   };
 
   services.ssh-agent = {
