@@ -136,6 +136,7 @@ in {
     kitty
     linux-wifi-hotspot
     feh
+    spotube
     prismlauncher
     lxqt.lxqt-policykit
     autorandr

@@ -76,6 +76,23 @@ in {
     }
   ];
 
+  autoCmd = [
+    {
+      event = [ "BufWritePost" ];
+      pattern = [ "*.java" ];
+      callback = mkRaw ''
+        function()
+          pcall(vim.lsp.codelens.refresh)
+        end
+      '';
+    }
+    {
+      event = [ "BufLeave" ];
+      pattern = [ "term://*" ];
+      command = "stopinsert";
+    }
+  ];
+
   colorschemes.catppuccin = {
     enable = true;
 
@@ -95,10 +112,7 @@ in {
         hash = "sha256-eLF//fM3+Qxj/fJ1ydrMCrXAvX0kX8Yl7Iz181Fc2Xo=";
       };
     })
-  ] ++ (with vimPlugins; [
-    #lsp-inlayhints-nvim
-    #nvim-lspconfig
-  ]);
+  ];
 
   plugins = {
     nix.enable = true;
@@ -118,14 +132,19 @@ in {
     web-devicons.enable = true;
     nvim-surround.enable = true;
     treesitter.enable = true;
+    dap.enable = true;
     
     lsp = {
       enable = true;
 
-      #TODO: questionable second line
       onAttach = ''
-        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-        --require("inlay-hints").on_attach(client, bufnr)
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts, "Go to definition")
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts, "Go to references")
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts, "Got to implementation")
+        vim.keymap.set('n', 'rn', vim.lsp.buf.rename, bufopts, "Rename")
+        vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts, "Show signature")
+        vim.lsp.inlay_hint.enable(true)
+        pcall(vim.lsp.codelens.refresh)
       '';
 
       servers = {
@@ -161,11 +180,91 @@ in {
 
         jdt-language-server = {
           enable = true;
+
+          settings = {
+            java = {
+              eclipse = {
+                downloadSources = true;
+              };
+
+              gradle = {
+                enabled = true;
+              };
+
+              maven = {
+                downloadSources = true;
+              };
+              
+              implementationsCodeLens = {
+                enabled = true;
+              };
+
+              referencesCodeLens = {
+                enabled = true;
+              };
+
+              references = {
+                includeDecompiledSources = true;
+              };
+              
+              inlayHints = {
+                parameterNames = {
+                  enabled = "all";
+                };
+              };
+
+              codeGeneration = {
+                toString = {
+                  template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
+                };
+
+                hashCodeEquals = {
+                  useJava7Objects = true;
+                };
+
+                useBlocks = true;
+              };
+            };
+          };
+
+          extraOptions = {
+            signatureHelp = {
+              enabled = true;
+            };
+
+            contentProvider = {
+              preferred = "fernflower";
+            };
+
+            sources = {
+              organizeImports = {
+                starThreshold = 9999;
+                staticStarThreshold = 9999;
+              };
+            };
+
+            
+            codeGeneration = {
+              toString = {
+                template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
+              };
+
+              useBlocks = true;
+            };
+
+            flags = {
+              allow_incremental_sync = true;
+            };
+
+            init_options = {
+              bundles = mkRaw "{ vim.fn.glob('${./.}/com.microsoft.java.debug.plugin-*.jar'), }";
+            };
+          };
         };
 
-        #bashls = {
-        #  enable = true;
-        #};
+        bashls = {
+          enable = true;
+        };
       };
     };
 
