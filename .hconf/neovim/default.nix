@@ -127,29 +127,42 @@ in {
     compiler.enable = true;
     autoclose.enable = true;
     lsp-lines.enable = true;
+    lsp-signature.enable = true;
     specs.enable = true;
     barbar.enable = true;
     web-devicons.enable = true;
     nvim-surround.enable = true;
     treesitter.enable = true;
     dap.enable = true;
+    image.enable = true;
     
     lsp = {
       enable = true;
+      inlayHints = true;
+
+      keymaps = {
+        lspBuf = {
+          gd = "definition";
+          gr = "references";
+          gi = "implementation";
+          rn = "rename";
+          "<C-k>" = "signature_help";
+        };
+      };
 
       onAttach = ''
-        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts, "Go to definition")
-        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts, "Go to references")
-        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts, "Got to implementation")
-        vim.keymap.set('n', 'rn', vim.lsp.buf.rename, bufopts, "Rename")
-        vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts, "Show signature")
-        vim.lsp.inlay_hint.enable(true)
         pcall(vim.lsp.codelens.refresh)
       '';
 
       servers = {
         nixd = {
           enable = true;
+
+          settings = {
+            diagnostic.suppress = [
+              "sema-escaping-with"
+            ];
+          };
         };
 
         rust-analyzer = {
@@ -159,6 +172,68 @@ in {
 
           settings = {
             checkOnSave = false;
+
+            completion = {
+              autoimport = {
+                enable = true;
+              };
+            };
+
+            lens = {
+              enable = true;
+
+              implementations = {
+                enable = true;
+              };
+
+              references = {
+                adt.enable = true;
+                enumVariant.enable = true;
+                method.enable = true;
+                trait.enable = true;
+              };
+            };
+
+            inlayHints = {
+              renderColons = true;
+              maxLength = 25;
+
+              bindingModeHints = {
+                enable = false;
+              };
+
+              chainingHints = {
+                enable = true;
+              };
+
+              closingBraceHints = {
+                enable = true;
+                minLines = 25;
+              };
+
+              closureReturnTypeHints = {
+                enable = "never";
+              };
+
+              lifetimeElisionHints = {
+                enable = "never";
+                useParameterNames = false;
+              };
+
+              parameterHints = {
+                enable = true;
+              };
+
+              reborrowHints = {
+                enable = "never";
+              };
+              
+              typeHints = {
+                enable = true;
+                hideClosureInitialization = false;
+                hideNamedConstructor = false;
+              };
+            };
           };
         };
 
@@ -168,6 +243,17 @@ in {
 
         clangd = {
           enable = true;
+
+          settings = {
+            InlayHints = {
+              Designators = true;
+              Enabled = true;
+              ParameterNames = true;
+              DeducedTypes = true;
+            };
+
+            fallbackFlags = [ "-std=c++20" ];
+          };
         };
 
         omnisharp = {
@@ -176,6 +262,14 @@ in {
 
         kotlin-language-server = {
           enable = true;
+
+          settings = {
+            hints = {
+              typeHints = true;
+              parameterHints = true;
+              chaineHints = true;
+            };
+          };
         };
 
         jdt-language-server = {
