@@ -3,7 +3,7 @@
 let
   aurpkgs = import (builtins.fetchGit {
     url = "https://github.com/StellarWitch7/nurpkgs";
-  }) { };
+  }) { inherit pkgs; };
   editor = "nvim";
   browser = "firefox";
   terminal = "${pkgs.kitty.out}/bin/kitty";
@@ -98,6 +98,14 @@ in {
       text="$2"
       
       echo "notify-send --category reminder 'Reminder' '$text'" | at now + "$time"
+    '')
+    (writeShellScriptBin "litterbox" ''
+      link=$(curl -F "reqtype=fileupload" -F "time=72h" -F "fileToUpload=@$1" https://litterbox.catbox.moe/resources/internals/api.php)
+      echo "Copying $link to clipboard using xclip"
+      echo $link | xclip
+    '')
+    (writeShellScriptBin "rec-sed" ''
+      find ./ -type f -exec sed -i -e "$1" {} \;
     '')
     unstable.vesktop
     unstable.zed-editor
@@ -207,6 +215,7 @@ in {
       alias nix-build="nix-build --log-format bar-with-logs"
       alias nix-store="nix-store --log-format bar-with-logs"
       alias nixos-rebuild="nixos-rebuild --log-format bar-with-logs"
+      alias nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
     '';
   };
 
@@ -312,6 +321,10 @@ in {
     };
   };
 
+  xdg = import (hconf + /xdg) {
+    inherit lib pkgs;
+  };
+
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -345,13 +358,6 @@ in {
 
     HISTCONTROL = "ignoredups:ignorespace";
     HISTTIMEFORMAT = "[%Y/%m/%d @ %H:%M:%S] ";
-
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_CACHE_HOME = "$HOME/.cache";
-    XDG_DATA_HOME = "$HOME/.local/share";
-    XDG_STATE_HOME = "$HOME/.local/state";
-
-    XDG_DATA_DIRS = "$XDG_DATA_DIRS:/usr/share:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
   };

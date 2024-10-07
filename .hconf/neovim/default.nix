@@ -46,6 +46,15 @@ in {
       options.desc = "Closes the current tab";
     }
     {
+      key = "<leader>d";
+      action = mkRaw ''
+        function()
+          vim.diagnostic.open_float(0, {scope="line"})
+        end
+      '';
+      options.desc = "Displays off-screen text for the current line";
+    }
+    {
       key = "<leader>i";
       action = mkRaw ''
         function()
@@ -146,6 +155,7 @@ in {
           gr = "references";
           gi = "implementation";
           rn = "rename";
+          ca = "code_action";
           "<C-k>" = "signature_help";
         };
       };
