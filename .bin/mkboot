@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+nix-build '<nixpkgs/nixos>' -A config.system.build.netbootIpxeScript -A config.system.build.netbootRamdisk --arg configuration '{
+  imports = [ <nixpkgs/nixos/modules/installer/netboot/netboot-base.nix> ];
+  networking.wireless.enable = true;
+  users.users.root = {
+    hashedPassword = "$y$j9T$19Dz9VL5Bmx2S09MDyT//0$WmMkyDEVWz/pQPXK9rbbN1TXaMfFUrfuNC2nFPLv/c4";
+  };
+}'

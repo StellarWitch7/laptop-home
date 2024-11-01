@@ -1,5 +1,6 @@
 { lib
 , pkgs
+, aurpkgs
 , dir
 , hconf
 , lock
@@ -10,7 +11,19 @@
 , screenshot-full
 , screenshot-gui }:
 
-{
+let
+  animated-bg = pkgs.stdenv.mkDerivation {
+    name = "i3-bg";
+    src = ./.;
+
+    installPhase = ''
+      mkdir -p $out/bin
+      ${aurpkgs.i3-animated-wallpaper.out}/bin/i3-wp-generate ${./bg.gif} $out/bg
+      printf "\#!/usr/bin/env bash\n\n${aurpkgs.i3-animated-wallpaper.out}/bin/i3-wp-loop $out/bg \"0.1\"" >$out/bin/start
+      chmod +x $out/bin/start
+    '';
+  };
+in {
   enable = true;
 
   extraConfig = ''
@@ -22,7 +35,6 @@
     modifier = "Mod4";
     menu = "${pkgs.rofi.out}/bin/rofi -show drun -run-command \"i3-msg exec '{cmd}'\" -show-icons";
     defaultWorkspace = "workspace number 1";
-    #workspaceLayout = "tabbed";
 
     startup = let
       mkCmd = command: always: {
@@ -37,6 +49,7 @@
     ] ++ (with pkgs; [
       (mkAlways "${autorandr.out}/bin/autorandr -c")
       (mkAlways "${feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg")
+      #(mkAlways "${animated-bg.out}/bin/start")
       (mkAlways "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4")
       (mkOnce "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent")
       (mkOnce "${picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}")
@@ -48,15 +61,18 @@
       (mkOnce "${keepassxc.out}/bin/keepassxc")
       (mkOnce "${qbittorrent.out}/bin/qbittorrent")
       (mkOnce "${blueman.out}/bin/blueman-applet")
+      (mkOnce "${warpd.out}/bin/warpd")
       (mkOnce "${rclone.out}/bin/rclone mount AuraGDrive: ${dir}/CloudData/AuraGDrive")
     ]);
 
     keybindings = let
       mod = modifier;
-      wspace_key = "${mod}+Mod2+KP";
-      wspace_mv_key = "${mod}+Mod1+Mod2+KP";
-      wspace_cmd = "workspace number";
-      wspace_mv_cmd = "move container to workspace number";
+      mkWorkspaceFocus = last: if last == 0 then { } else {
+        "${mod}+Mod2+KP_${builtins.toString last}" = "workspace number ${builtins.toString last}";
+      } // mkWorkspaceFocus (last - 1);
+      mkWorkspaceMove = last: if last == 0 then { } else {
+        "${mod}+Mod1+Mod2+KP_${builtins.toString last}" = "move container to workspace number ${builtins.toString last}";
+      } // mkWorkspaceMove (last - 1);
     in {
       # kill windows
       "${mod}+Delete" = "kill";
@@ -80,10 +96,17 @@
       "${mod}+z" = "exec --no-startup-id autorandr -c";
 
       # modify audio settings
-      "XF86AudioRaiseVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10%";
-      "XF86AudioLowerVolume" = "exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10%";
-      "XF86AudioMute" = "exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle";
-      "XF86AudioMicMute" = "exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle";
+      "${mod}+k" = "exec --no-startup-id ${pkgs.pulseaudio.out}/bin/pactl set-sink-volume @DEFAULT_SINK@ +10%";
+      "${mod}+j" = "exec --no-startup-id ${pkgs.pulseaudio.out}/bin/pactl set-sink-volume @DEFAULT_SINK@ -10%";
+      "${mod}+n" = "exec --no-startup-id ${pkgs.pulseaudio.out}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
+      "${mod}+m" = "exec --no-startup-id ${pkgs.pulseaudio.out}/bin/pactl set-source-mute @DEFAULT_SOURCE@ toggle";
+
+      # clipboard management
+      "${mod}+p" = "exec --no-startup-id ${aurpkgs.dont-repeat-yourself.out}/bin/dont-repeat-yourself load";
+      "${mod}+Shift+p" = "exec --no-startup-id ${aurpkgs.dont-repeat-yourself.out}/bin/dont-repeat-yourself save";
+
+      # calculator
+      "${mod}+o" = "exec --no-startup-id ${terminal} octave";
 
       # change focus
       "${mod}+Left" = "focus left";
@@ -119,37 +142,15 @@
 
       # restart i3 inplace
       "${mod}+Shift+r" = "restart";
-
-      # switch to workspace
-      "${wspace_key}_1" = "${wspace_cmd} 1";
-      "${wspace_key}_2" = "${wspace_cmd} 2";
-      "${wspace_key}_3" = "${wspace_cmd} 3";
-      "${wspace_key}_4" = "${wspace_cmd} 4";
-      "${wspace_key}_5" = "${wspace_cmd} 5";
-      "${wspace_key}_6" = "${wspace_cmd} 6";
-      "${wspace_key}_7" = "${wspace_cmd} 7";
-      "${wspace_key}_8" = "${wspace_cmd} 8";
-      "${wspace_key}_9" = "${wspace_cmd} 9";
-
-      # move window to workspace
-      "${wspace_mv_key}_1" = "${wspace_mv_cmd} 1";
-      "${wspace_mv_key}_2" = "${wspace_mv_cmd} 2";
-      "${wspace_mv_key}_3" = "${wspace_mv_cmd} 3";
-      "${wspace_mv_key}_4" = "${wspace_mv_cmd} 4";
-      "${wspace_mv_key}_5" = "${wspace_mv_cmd} 5";
-      "${wspace_mv_key}_6" = "${wspace_mv_cmd} 6";
-      "${wspace_mv_key}_7" = "${wspace_mv_cmd} 7";
-      "${wspace_mv_key}_8" = "${wspace_mv_cmd} 8";
-      "${wspace_mv_key}_9" = "${wspace_mv_cmd} 9";
-    };
+    } // mkWorkspaceFocus 9 // mkWorkspaceMove 9;
 
     modes = {
       powermenu = {
-        "l" = "exec --no-startup-id ${lock}, mode \"default\"";
-        "e" = "exec --no-startup-id i3-msg exit, mode \"default\"";
-        "h" = "exec --no-startup-id ${lock} && systemctl hibernate, mode \"default\"";
-        "r" = "exec --no-startup-id systemctl reboot, mode \"default\"";
-        "s" = "exec --no-startup-id systemctl poweroff -i, mode \"default\"";
+        "l" = "exec ${lock}, mode \"default\"";
+        "e" = "exec i3-msg exit, mode \"default\"";
+        "h" = "exec ${lock} && systemctl hibernate, mode \"default\"";
+        "r" = "exec systemctl reboot, mode \"default\"";
+        "s" = "exec systemctl poweroff -i, mode \"default\"";
 
         # back to normal: Enter, Escape, or Backspace
         "Return" = "mode \"default\"";
@@ -162,6 +163,12 @@
       titlebar = true;
       border = 2;
       inherit modifier;
+
+      criteria = [
+        {
+          class = "dont-repeat-yourself";
+        }
+      ];
     };
 
     focus = {
@@ -180,6 +187,45 @@
           criteria = {
             class = ".blueman-applet-wrapped";
           };
+        }
+        {
+          command = "focus";
+
+          criteria = {
+            class = "vesktop";
+          };
+        }
+        {
+          command = "focus";
+
+          criteria = {
+            class = "firefox";
+          };
+        }
+        {
+          command = "focus";
+
+          criteria = {
+            class = "FreeTube";
+          };
+        }
+      ];
+    };
+
+    assigns = {
+      "1" = [
+        {
+          class = "vesktop";
+        }
+      ];
+      "2" = [
+        {
+          class = "firefox";
+        }
+      ];
+      "9" = [
+        {
+          class = "FreeTube";
         }
       ];
     };

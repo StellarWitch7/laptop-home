@@ -165,6 +165,14 @@ in {
       '';
 
       servers = {
+        pylyzer = {
+          enable = true;
+        };
+
+        metals = {
+          enable = true;
+        };
+
         nixd = {
           enable = true;
 
@@ -175,7 +183,7 @@ in {
           };
         };
 
-        rust-analyzer = {
+        rust_analyzer = {
           enable = true;
           installCargo = true;
           installRustc = true;
@@ -249,6 +257,7 @@ in {
 
         hls = {
           enable = true;
+          installGhc = true;
         };
 
         clangd = {
@@ -270,7 +279,7 @@ in {
           enable = true;
         };
 
-        kotlin-language-server = {
+        kotlin_language_server = {
           enable = true;
 
           settings = {
@@ -282,7 +291,7 @@ in {
           };
         };
 
-        jdt-language-server = {
+        jdtls = {
           enable = true;
 
           settings = {

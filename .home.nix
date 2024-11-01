@@ -4,6 +4,12 @@ let
   aurpkgs = import (builtins.fetchGit {
     url = "https://github.com/StellarWitch7/nurpkgs";
   }) { inherit pkgs; };
+  pinnedPkgs = import (pkgs.fetchFromGitHub {
+    owner = "NixOS";
+    repo = "nixpkgs";
+    rev = "89172919243df199fe237ba0f776c3e3e3d72367";
+    hash = "sha256-Gf04dXB0n4q0A9G5nTGH3zuMGr6jtJppqdeljxua1fo=";
+  }) { config.allowUnfree = true; };
   editor = "nvim";
   browser = "firefox";
   terminal = "${pkgs.kitty.out}/bin/kitty";
@@ -46,15 +52,6 @@ in {
   home.username = name;
   home.homeDirectory = dir;
 
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
-  #
-  # You should not change this value, even if you update Home Manager. If you do
-  # want to update the value, then make sure to first check the Home Manager
-  # release notes.
-  home.stateVersion = "23.11"; # Please read the comment before changing.
-
   catppuccin = {
     flavor = "mocha";
     accent = "mauve";
@@ -62,9 +59,9 @@ in {
 
   imports = [
     /etc/nixos/default-home.nix
-    "${builtins.fetchGit {
+    (builtins.fetchGit {
       url = "https://github.com/catppuccin/nix";
-    }}/modules/home-manager"
+    } + /modules/home-manager)
     (import (builtins.fetchGit {
       url = "https://github.com/nix-community/nixvim";
     })).homeManagerModules.nixvim
@@ -79,6 +76,10 @@ in {
     vault
     bar
     ImageSorter
+  ]) ++ (with pinnedPkgs; [
+    aseprite
+    krita
+    ffmpeg
   ]) ++ (with pkgs; [
     (writeShellScriptBin "recon-gdrive" ''
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
@@ -88,7 +89,7 @@ in {
       nix-shell -p dotnet-sdk csharpier --run "dotnet-csharpier $@"
     '')
     (writeShellScriptBin "hotspot" ''
-      pkexec --user root ${linux-wifi-hotspot.out}/bin/create_ap wlp0s20f3 wlp0s20f3 "solanix" "$1" --mkconfig /etc/create_ap.conf -g 1.1.1.1
+      pkexec --user root ${linux-wifi-hotspot.out}/bin/create_ap wlan0 wlan0 "solanix" "$1" --mkconfig /etc/create_ap.conf -g 1.1.1.1
     '')
     (writeShellScriptBin "hotspot-gui" ''
       exec ${linux-wifi-hotspot.out}/bin/wihotspot-gui "$@"
@@ -107,8 +108,10 @@ in {
     (writeShellScriptBin "rec-sed" ''
       find ./ -type f -exec sed -i -e "$1" {} \;
     '')
+    (writeShellScriptBin "qmth" ''
+      printf "$@" | ${octave.out}/bin/octave
+    '')
     unstable.vesktop
-    unstable.zed-editor
     octave
     xplr
     firefox
@@ -118,17 +121,18 @@ in {
     gitnr
     calibre
     zathura
+    r2modman
     simplescreenrecorder
     freetube
     firefox
     libreoffice
     hunspell
     tree
-    aseprite
     blockbench
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
+    skim
     yt-dlp
     bottom
     sirikali
@@ -143,8 +147,6 @@ in {
     blueman
     kitty
     linux-wifi-hotspot
-    feh
-    spotube
     prismlauncher
     lxqt.lxqt-policykit
     autorandr
@@ -163,12 +165,11 @@ in {
     gnome.file-roller
     bruno
     kitty-themes
-    xed-editor
     gnome.ghex
-    krita
-    ffmpeg
-    #obsidian
-    #vscode
+    #unstable.spotube
+    #unstable.obsidian
+    #unstable.zed-editor
+    #unstable.vscode
     #unstable.jetbrains.rust-rover
     #unstable.jetbrains.rider
     #unstable.jetbrains.idea-ultimate
@@ -181,7 +182,7 @@ in {
     numlock.enable = true;
 
     windowManager.i3 = import (hconf + /i3) {
-      inherit lib pkgs dir hconf lock terminal browser sswitcher pbar-start screenshot-full screenshot-gui;
+      inherit lib pkgs aurpkgs dir hconf lock terminal browser sswitcher pbar-start screenshot-full screenshot-gui;
     };
   };
 
@@ -216,6 +217,8 @@ in {
       alias nix-store="nix-store --log-format bar-with-logs"
       alias nixos-rebuild="nixos-rebuild --log-format bar-with-logs"
       alias nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
+
+      alias i2pbit="qbittorrent --configuration=I2Pprofile"
     '';
   };
 
@@ -267,12 +270,8 @@ in {
     defaultCacheTtl = 1800;
   };
 
-  services.polybar = {
-    enable = true;
-    catppuccin.enable = true;
-    package = pkgs.polybarFull;
-    config = hconf + /polybar/config.ini;
-    script = "";
+  services.polybar = import (hconf + /polybar) {
+    inherit pkgs;
   };
 
   services.dunst = {
@@ -307,6 +306,7 @@ in {
 
   gtk = {
     enable = true;
+
     catppuccin = {
       enable = true;
       icon.enable = true;
@@ -318,6 +318,33 @@ in {
 
     iconTheme = {
       name = "Papirus-Dark";
+    };
+
+    gtk2.extraConfig = ''
+      gtk-application-prefer-dark-theme=true
+    '';
+
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+  };
+
+  qt = {
+    enable = true;
+    style.name = "gtk2";
+  };
+
+  dconf = {
+    enable = true;
+
+    settings = {
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+      };
     };
   };
 
@@ -361,4 +388,13 @@ in {
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
   };
+
+  # This value determines the Home Manager release that your configuration is
+  # compatible with. This helps avoid breakage when a new Home Manager release
+  # introduces backwards incompatible changes.
+  #
+  # You should not change this value, even if you update Home Manager. If you do
+  # want to update the value, then make sure to first check the Home Manager
+  # release notes.
+  home.stateVersion = "23.11"; # Please read the comment before changing.
 }
