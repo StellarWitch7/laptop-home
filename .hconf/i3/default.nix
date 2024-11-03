@@ -108,6 +108,10 @@ in {
       # calculator
       "${mod}+o" = "exec --no-startup-id ${terminal} octave";
 
+      # keyboard layout
+      "${mod}+g" = "exec --no-startup-id ${pkgs.xorg.setxkbmap.out}/bin/setxkbmap us";
+      "${mod}+t" = "exec --no-startup-id ${pkgs.xorg.setxkbmap.out}/bin/setxkbmap ca";
+
       # change focus
       "${mod}+Left" = "focus left";
       "${mod}+Down" = "focus down";

@@ -103,7 +103,7 @@ in {
     (writeShellScriptBin "litterbox" ''
       link=$(curl -F "reqtype=fileupload" -F "time=72h" -F "fileToUpload=@$1" https://litterbox.catbox.moe/resources/internals/api.php)
       echo "Copying $link to clipboard using xclip"
-      echo $link | xclip
+      echo $link | xclip -selection CLIPBOARD
     '')
     (writeShellScriptBin "rec-sed" ''
       find ./ -type f -exec sed -i -e "$1" {} \;
