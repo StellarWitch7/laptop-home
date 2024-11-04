@@ -46,15 +46,6 @@ in {
       options.desc = "Closes the current tab";
     }
     {
-      key = "<leader>d";
-      action = mkRaw ''
-        function()
-          vim.diagnostic.open_float(0, {scope="line"})
-        end
-      '';
-      options.desc = "Displays off-screen text for the current line";
-    }
-    {
       key = "<leader>i";
       action = mkRaw ''
         function()
@@ -73,7 +64,42 @@ in {
       options.desc = "Executes the current file in the terminal";
     }
     {
-      key = "<C-t>";
+      key = "<leader>.";
+      action = "<cmd>lua require'dap'.toggle_breakpoint()<CR>";
+      options.desc = "Toggles a breakpoint on the current line";
+    }
+    {
+      key = "<leader>,";
+      action = "<cmd>lua require'dap'.step_over()<CR>";
+      options.desc = "Step over line";
+    }
+    {
+      key = "<leader>l";
+      action = "<cmd>lua require'dap'.step_into()<CR>";
+      options.desc = "Step into line";
+    }
+    {
+      key = "<C-s>";
+      action = "<cmd>lua require'dap'.continue()<CR>";
+      options.desc = "Debugger";
+
+      mode = [
+        "n"
+        "v"
+      ];
+    }
+    {
+      key = "<C-d>";
+      action = "<cmd>lua require'dap'.repl.toggle()<CR>";
+      options.desc = "Toggles the DAP REPL";
+
+      mode = [
+        "n"
+        "v"
+      ];
+    }
+    {
+      key = "<C-a>";
       action = "<cmd>ToggleTerm<CR>";
       options.desc = "Toggles the terminal";
 
@@ -142,14 +168,43 @@ in {
     web-devicons.enable = true;
     nvim-surround.enable = true;
     treesitter.enable = true;
-    dap.enable = true;
     image.enable = true;
     
+    dap = {
+      enable = true;
+
+      extensions = {
+        dap-ui = {
+          enable = true;
+        };
+      };
+
+      configurations = {
+        java = [
+          {
+            name = "Attach Debugger";
+            type = "java";
+            request = "attach";
+            hostName = "localhost";
+            port = 5005;
+          }
+          {
+            name = "Launch Debug";
+            type = "java";
+            request = "launch";
+          }
+        ];
+      };
+    };
+
     lsp = {
       enable = true;
       inlayHints = true;
 
       keymaps = {
+        diagnostic = {
+          "<leader>d" = "open_float";
+        };
         lspBuf = {
           gd = "definition";
           gr = "references";
@@ -291,92 +346,101 @@ in {
           };
         };
 
-        jdtls = {
-          enable = true;
-
-          settings = {
-            java = {
-              eclipse = {
-                downloadSources = true;
-              };
-
-              gradle = {
-                enabled = true;
-              };
-
-              maven = {
-                downloadSources = true;
-              };
-              
-              implementationsCodeLens = {
-                enabled = true;
-              };
-
-              referencesCodeLens = {
-                enabled = true;
-              };
-
-              references = {
-                includeDecompiledSources = true;
-              };
-              
-              inlayHints = {
-                parameterNames = {
-                  enabled = "all";
-                };
-              };
-
-              codeGeneration = {
-                toString = {
-                  template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
-                };
-
-                hashCodeEquals = {
-                  useJava7Objects = true;
-                };
-
-                useBlocks = true;
-              };
-            };
-          };
-
-          extraOptions = {
-            signatureHelp = {
-              enabled = true;
-            };
-
-            contentProvider = {
-              preferred = "fernflower";
-            };
-
-            sources = {
-              organizeImports = {
-                starThreshold = 9999;
-                staticStarThreshold = 9999;
-              };
-            };
-
-            
-            codeGeneration = {
-              toString = {
-                template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
-              };
-
-              useBlocks = true;
-            };
-
-            flags = {
-              allow_incremental_sync = true;
-            };
-
-            init_options = {
-              bundles = mkRaw "{ vim.fn.glob('${./.}/com.microsoft.java.debug.plugin-*.jar'), }";
-            };
-          };
-        };
-
         bashls = {
           enable = true;
+        };
+
+        jdtls = {
+          onAttach.function = ''
+            require('jdtls.dap').setup_dap({ hotcodereplace = 'auto' })
+            require('jdtls.dap').setup_dap_main_class_configs()
+            vim.lsp.codelens.refresh()
+          '';
+        };
+      };
+    };
+
+    nvim-jdtls = {
+      enable = true;
+      configuration = "${config.home.homeDirectory}/.config/jdtls/config";
+      data = mkRaw "'${config.home.homeDirectory}/.local/share/jdtls/workspace' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')";
+
+      initOptions = {
+        bundles = mkRaw "{ vim.fn.glob('${./.}/com.microsoft.java.debug.plugin-*.jar'), }";
+      };
+
+      extraOptions = {
+        signatureHelp = {
+          enabled = true;
+        };
+
+        contentProvider = {
+          preferred = "fernflower";
+        };
+
+        sources = {
+          organizeImports = {
+            starThreshold = 5;
+            staticStarThreshold = 5;
+          };
+        };
+        
+        codeGeneration = {
+          toString = {
+            template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
+          };
+
+          useBlocks = true;
+        };
+
+        flags = {
+          allow_incremental_sync = true;
+        };
+      };
+
+      settings = {
+        java = {
+          eclipse = {
+            downloadSources = true;
+          };
+
+          gradle = {
+            enabled = true;
+          };
+
+          maven = {
+            downloadSources = true;
+          };
+          
+          implementationsCodeLens = {
+            enabled = true;
+          };
+
+          referencesCodeLens = {
+            enabled = true;
+          };
+
+          references = {
+            includeDecompiledSources = true;
+          };
+          
+          inlayHints = {
+            parameterNames = {
+              enabled = "all";
+            };
+          };
+
+          codeGeneration = {
+            toString = {
+              template = "\${object.className}{\${member.name()}=\${member.value}, \${otherMembers}}";
+            };
+
+            hashCodeEquals = {
+              useJava7Objects = true;
+            };
+
+            useBlocks = true;
+          };
         };
       };
     };
