@@ -134,6 +134,7 @@ in {
     hunspellDicts.en_GB-ise
     skim
     yt-dlp
+    celeste64
     bottom
     sirikali
     flameshot

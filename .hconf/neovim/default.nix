@@ -36,6 +36,11 @@ in {
       options.desc = "Opens the Telescope file picker";
     }
     {
+      key = "<leader>t";
+      action = "<cmd>Telescope grep_string<CR>";
+      options.desc = "Opens the Telescope text search";
+    }
+    {
       key = "<leader>b";
       action = "<cmd>BufferPick<CR>";
       options.desc = "Opens the tab picker";
