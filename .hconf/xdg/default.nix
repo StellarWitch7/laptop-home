@@ -8,7 +8,7 @@
 
     defaultApplications = let
       archive-manager = "org.gnome.FileRoller.desktop";
-      file-manager = "thunar.desktop";
+      file-manager = "xplr.desktop";
       vlc = "vlc.desktop";
     in {
       "inode/directory" = file-manager;

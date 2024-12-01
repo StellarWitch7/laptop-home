@@ -174,6 +174,10 @@ in {
     nvim-surround.enable = true;
     treesitter.enable = true;
     image.enable = true;
+    direnv.enable = true;
+    twilight.enable = true;
+    rainbow-delimiters.enable = true;
+    render-markdown.enable = true;
     
     dap = {
       enable = true;
@@ -225,14 +229,6 @@ in {
       '';
 
       servers = {
-        pylyzer = {
-          enable = true;
-        };
-
-        metals = {
-          enable = true;
-        };
-
         nixd = {
           enable = true;
 
@@ -335,21 +331,21 @@ in {
           };
         };
 
-        omnisharp = {
-          enable = true;
-        };
+        # omnisharp = {
+        #   enable = true;
+        # };
 
-        kotlin_language_server = {
-          enable = true;
-
-          settings = {
-            hints = {
-              typeHints = true;
-              parameterHints = true;
-              chaineHints = true;
-            };
-          };
-        };
+        # kotlin_language_server = {
+        #   enable = true;
+        #
+        #   settings = {
+        #     hints = {
+        #       typeHints = true;
+        #       parameterHints = true;
+        #       chaineHints = true;
+        #     };
+        #   };
+        # };
 
         bashls = {
           enable = true;
@@ -448,6 +444,48 @@ in {
           };
         };
       };
+    };
+
+    lazy = {
+      enable = true;
+
+      plugins = [
+        # {
+        #   name = "scalameta/nvim-metals";
+        #   enabled = true;
+        #   pkg = pkgs.vimPlugins.nvim-metals;
+        #   dependencies = [
+        #     pkgs.vimPlugins.plenary-nvim
+        #   ];
+        #   ft = [
+        #     "scala"
+        #     "sbt"
+        #     "java"
+        #   ];
+        #   opts = mkRaw ''
+        #     function()
+        #       local metals_config = require("metals").bare_config()
+        #       metals_config.on_attach = function(client, bufnr)
+        #         -- your on_attach function
+        #       end
+        #
+        #       return metals_config
+        #     end
+        #   '';
+        #   config = mkRaw ''
+        #     function(self, metals_config)
+        #       local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+        #       vim.api.nvim_create_autocmd("FileType", {
+        #         pattern = self.ft,
+        #         callback = function()
+        #           require("metals").initialize_or_attach(metals_config)
+        #         end,
+        #         group = nvim_metals_group,
+        #       })
+        #     end
+        #   '';
+        # }
+      ];
     };
 
     coq-nvim = {

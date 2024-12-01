@@ -54,14 +54,14 @@ in {
       (mkOnce "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent")
       (mkOnce "${picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}")
       (mkOnce "${openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\"")
-      (mkOnce "${dunst.out}/bin/dunst")
       (mkOnce "${flameshot.out}/bin/flameshot")
       (mkOnce "${networkmanagerapplet.out}/bin/nm-applet")
       (mkOnce "${sirikali.out}/bin/sirikali")
       (mkOnce "${keepassxc.out}/bin/keepassxc")
       (mkOnce "${qbittorrent.out}/bin/qbittorrent")
       (mkOnce "${blueman.out}/bin/blueman-applet")
-      (mkOnce "${warpd.out}/bin/warpd")
+      (mkOnce "${warpd.out}/bin/warpd --config ${hconf + /warpd/warpd.conf}")
+      (mkOnce "${ghostie.out}/bin/ghostie start")
       (mkOnce "${rclone.out}/bin/rclone mount AuraGDrive: ${dir}/CloudData/AuraGDrive")
     ]);
 
@@ -146,6 +146,11 @@ in {
 
       # restart i3 inplace
       "${mod}+Shift+r" = "restart";
+
+      "${mod}+Mod2+KP_0" = "scratchpad show; floating disable";
+      "${mod}+Mod1+Mod2+KP_0" = "move scratchpad";
+
+      "${mod}+End" = "floating toggle";
     } // mkWorkspaceFocus 9 // mkWorkspaceMove 9;
 
     modes = {

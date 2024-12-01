@@ -7,8 +7,8 @@ let
   pinnedPkgs = import (pkgs.fetchFromGitHub {
     owner = "NixOS";
     repo = "nixpkgs";
-    rev = "89172919243df199fe237ba0f776c3e3e3d72367";
-    hash = "sha256-Gf04dXB0n4q0A9G5nTGH3zuMGr6jtJppqdeljxua1fo=";
+    rev = "c71ad5c34d51dcbda4c15f44ea4e4aa6bb6ac1e9";
+    hash = "sha256-fYNXgpu1AEeLyd3fQt4Ym0tcVP7cdJ8wRoqJ+CtTRyY=";
   }) { config.allowUnfree = true; };
   editor = "nvim";
   browser = "firefox";
@@ -64,6 +64,7 @@ in {
     } + /modules/home-manager)
     (import (builtins.fetchGit {
       url = "https://github.com/nix-community/nixvim";
+      ref = "nixos-24.11";
     })).homeManagerModules.nixvim
   ];
 
@@ -75,7 +76,7 @@ in {
     git-nixed
     vault
     bar
-    ImageSorter
+    #ImageSorter # broken
   ]) ++ (with pinnedPkgs; [
     aseprite
     krita
@@ -85,9 +86,9 @@ in {
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
     '')
-    (writeShellScriptBin "cs-fmt" ''
-      nix-shell -p dotnet-sdk csharpier --run "dotnet-csharpier $@"
-    '')
+    # (writeShellScriptBin "cs-fmt" ''
+    #   nix-shell -p dotnet-sdk csharpier --run "dotnet-csharpier $@"
+    # '')
     (writeShellScriptBin "hotspot" ''
       pkexec --user root ${linux-wifi-hotspot.out}/bin/create_ap wlan0 wlan0 "solanix" "$1" --mkconfig /etc/create_ap.conf -g 1.1.1.1
     '')
@@ -113,7 +114,6 @@ in {
     '')
     unstable.vesktop
     octave
-    xplr
     firefox
     handbrake
     vlc
@@ -132,7 +132,7 @@ in {
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
-    skim
+    fzf
     yt-dlp
     celeste64
     bottom
@@ -151,31 +151,29 @@ in {
     prismlauncher
     lxqt.lxqt-policykit
     autorandr
-    unzip
     obs-studio
     with-shell
     networkmanagerapplet
     mindustry-server
     pavucontrol
     nix-output-monitor
-    unstable.invidtui
+    invidtui
     xclip
     glances
     keepassxc
     hyfetch
-    gnome.file-roller
     bruno
     kitty-themes
-    gnome.ghex
+    xdragon
+    dua
+    fzf
+    trash-cli
+    pistol
+    ghostie
+    ouch
     #unstable.spotube
     #unstable.obsidian
     #unstable.zed-editor
-    #unstable.vscode
-    #unstable.jetbrains.rust-rover
-    #unstable.jetbrains.rider
-    #unstable.jetbrains.idea-ultimate
-    #unstable.jetbrains.clion
-    #unstable.jetbrains.pycharm-professional
   ]);
 
   xsession = {
@@ -212,6 +210,7 @@ in {
       alias schp="xclip <~/Documents/school_pass.zip"
       alias miniarch="~/connect aurora nova711.asuscomm.com"
       alias update-clean="home-clean && sys-clean && sys-switch && switch"
+      alias school="xrandr --output HDMI-1-1 --primary --auto --output eDP-1 --off"
 
       alias nix-shell="nix-shell --log-format bar-with-logs"
       alias nix-build="nix-build --log-format bar-with-logs"
@@ -219,8 +218,14 @@ in {
       alias nixos-rebuild="nixos-rebuild --log-format bar-with-logs"
       alias nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
 
+      alias xcd="cd \$(xplr)"
       alias i2pbit="qbittorrent --configuration=I2Pprofile"
     '';
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableBashIntegration = true;
   };
 
   programs.starship = import (hconf + /starship) {
@@ -256,9 +261,142 @@ in {
     ];
   };
 
+  programs.xplr = {
+    enable = true;
+
+    plugins = with pkgs; {
+      zoxide = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "zoxide.xplr";
+        rev = "e50fd35db5c05e750a74c8f54761922464c1ad5f";
+        hash = "sha256-ZiOupn9Vq/czXI3JHvXUlAvAFdXrwoO3NqjjiCZXRnY=";
+      };
+
+      trash-cli = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "trash-cli.xplr";
+        rev = "2c5c8c64ec88c038e2075db3b1c123655dc446fa";
+        hash = "sha256-Yb6meF5TTVAL7JugPH/znvHhn588pF5g1luFW8YYA7U=";
+      };
+
+      dua-cli = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "dua-cli.xplr";
+        rev = "66ccf983fab7f67d6b00adc0365a2b26550e7f81";
+        hash = "sha256-XDhXaS8GuY3fuiSEL0WcLFilZ72emmjTVi07kv5c8n8=";
+      };
+
+      dragon = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "dragon.xplr";
+        rev = "5fbddcb33f7d75a5abd12d27223ac55589863335";
+        hash = "sha256-FJbyu5kK78XiTJl0NNXcI0KPOdXOPwpbBCWPUEpu5zA=";
+      };
+
+      fzf = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "fzf.xplr";
+        rev = "c8991f92946a7c8177d7f82ed939d845746ebaf5";
+        hash = "sha256-dpnta67p3fYEO3/GdvFlqzdyiMaJ9WbsnNmoIRHweMI=";
+      };
+
+      xclip = fetchFromGitHub {
+        owner = "sayanarijit";
+        repo = "xclip.xplr";
+        rev = "ddbcce2a255537ce8e3680575bbe964b49d05979";
+        hash = "sha256-9WYT52H6vfqTGos57/Um/UqVCkteTAbnUSQ5xDb+JrY=";
+      };
+
+      ouch = fetchFromGitHub {
+        owner = "dtomvan";
+        repo = "ouch.xplr";
+        rev = "375edf19ff3e0286bd7a101b9e4dd24fa5abaeb8";
+        hash = "sha256-YGFQKzIYIlL+UW2Nel2Tw7WC3MESaVbWYlpj5o2FfLs=";
+      };
+
+      nuke = fetchFromGitHub {
+        owner = "Junker";
+        repo = "nuke.xplr";
+        rev = "f83a7ed58a7212771b15fbf1fdfb0a07b23c81e9";
+        hash = "sha256-k/yre9SYNPYBM2W1DPpL6Ypt3w3EMO9dznHwa+fw/n0=";
+      };
+    };
+
+    extraConfig = ''
+      require("zoxide").setup({
+        bin = "zoxide",
+        mode = "default",
+        key = "Z",
+      })
+
+      require("trash-cli").setup({
+        -- Trash file(s)
+        trash_bin = "trash-put",
+        trash_mode = "delete",
+        trash_key = "d",
+
+        -- Empty trash
+        empty_bin = "trash-empty",
+        empty_mode = "delete",
+        empty_key = "E",
+
+        -- Interactive selector
+        trash_list_bin = "trash-list",
+        trash_list_selector = "fzf -m | cut -d' ' -f3-",
+
+        -- Restore file(s)
+        restore_bin = "trash-restore",
+
+        -- Restore files deleted from $PWD only
+        restore_mode = "delete",
+        restore_key = "r",
+
+        -- Restore files deleted globally
+        global_restore_mode = "delete",
+        global_restore_key = "R",
+      })
+      
+      require("dua-cli").setup({
+        mode = "action",
+        key = "D",
+      })
+      
+      require("dragon").setup({
+        mode = "selection_ops",
+        key = "D",
+        drag_args = "",
+        drop_args = "",
+        keep_selection = false,
+        bin = "dragon",
+      })
+
+      require("fzf").setup({
+        mode = "default",
+        key = "ctrl-f",
+        bin = "fzf",
+        args = "--preview 'pistol {}'",
+        recursive = true,  -- If true, search all files under $PWD
+        enter_dir = true,  -- Enter if the result is directory
+      })
+
+      require("xclip").setup{
+        copy_command = "xclip-copyfile",
+        copy_paths_command = "xclip -sel clip",
+        paste_command = "xclip-pastefile",
+        keep_selection = false,
+      }
+
+      require("ouch").setup{
+        mode = "action",
+        key = "o",
+      }
+
+      require("nuke").setup()
+    '';
+  };
+
   programs.nixvim = import (hconf + /neovim) {
-    inherit config;
-    pkgs = pkgs.unstable;
+    inherit config pkgs;
   };
 
   services.ssh-agent = {
@@ -278,13 +416,24 @@ in {
   services.dunst = {
     enable = true;
     catppuccin.enable = true;
+    configFile = "${dir}/.config/dunst/dunstrc";
 
     settings = {
+      global = {
+        ignore_dbusclose = true;
+      };
+
       remindme = {
         category = "reminder";
         background = "#333333";
         foreground = "#ff7f7f";
         timeout = 0;
+      };
+
+      #TODO: don't work
+      ghostie = {
+        appname = "Ghostie";
+        timeout = 10000; # ms
       };
     };
   };
@@ -357,10 +506,8 @@ in {
   # plain files is through 'home.file'.
   home.file = {
     #".config/dosomething/config.toml".source = /path/to/dosomething/config.toml;
-
-    #".gradle/gradle.properties".text = ''
-    #  org.gradle.console=verbose
-    #  org.gradle.daemon.idletimeout=3600000
+    #".config/dosomething/config.toml".text = ''
+    #  thing = 5
     #'';
   };
 
@@ -388,6 +535,9 @@ in {
     HISTTIMEFORMAT = "[%Y/%m/%d @ %H:%M:%S] ";
 
     QT_QPA_PLATFORMTHEME = "qt5ct";
+
+    _ZO_RESOLVE_SYMLINKS = 1;
+    _ZO_ECHO = 1;
   };
 
   # This value determines the Home Manager release that your configuration is
