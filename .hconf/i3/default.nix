@@ -156,10 +156,11 @@ in {
     modes = {
       powermenu = {
         "l" = "exec ${lock}, mode \"default\"";
+        "s" = "exec ${lock}, exec sleep 10 && systemctl sleep, mode \"default\"";
+        "h" = "exec ${lock}, exec sleep 10 && systemctl hibernate, mode \"default\"";
         "e" = "exec i3-msg exit, mode \"default\"";
-        "h" = "exec ${lock} && systemctl hibernate, mode \"default\"";
         "r" = "exec systemctl reboot, mode \"default\"";
-        "s" = "exec systemctl poweroff -i, mode \"default\"";
+        "Shift+s" = "exec systemctl poweroff -i, mode \"default\"";
 
         # back to normal: Enter, Escape, or Backspace
         "Return" = "mode \"default\"";

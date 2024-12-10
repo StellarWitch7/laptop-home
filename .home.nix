@@ -132,8 +132,13 @@ in {
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
+    hunspellDicts.tok
+    airshipper
     fzf
+    itch
     yt-dlp
+    osu-lazer-bin
+    the-powder-toy
     celeste64
     bottom
     sirikali
@@ -171,8 +176,8 @@ in {
     pistol
     ghostie
     ouch
+    obsidian
     #unstable.spotube
-    #unstable.obsidian
     #unstable.zed-editor
   ]);
 
@@ -241,7 +246,17 @@ in {
   programs.rofi = {
     enable = true;
     catppuccin.enable = true;
+
     inherit terminal;
+
+    plugins = with pkgs; [
+      rofi-calc
+      rofi-bluetooth
+      rofi-power-menu
+      rofi-pulse-select
+      rofi-file-browser
+      keepmenu
+    ];
   };
 
   programs.git = {
