@@ -46,7 +46,7 @@ let
   name = "aur";
   dir = "/home/${name}";
   hconf = /${dir}/.hconf;
-in {
+in rec {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = name;
@@ -179,14 +179,14 @@ in {
     obsidian
     #unstable.spotube
     #unstable.zed-editor
-  ]);
+  ]) ++ programs.rofi.plugins;
 
   xsession = {
     enable = true;
     numlock.enable = true;
 
     windowManager.i3 = import (hconf + /i3) {
-      inherit lib pkgs aurpkgs dir hconf lock terminal browser sswitcher pbar-start screenshot-full screenshot-gui;
+      inherit lib config pkgs aurpkgs dir hconf lock terminal browser sswitcher pbar-start screenshot-full screenshot-gui;
     };
   };
 
@@ -253,7 +253,6 @@ in {
       rofi-calc
       rofi-bluetooth
       rofi-power-menu
-      rofi-pulse-select
       rofi-file-browser
       keepmenu
     ];
@@ -444,12 +443,6 @@ in {
         foreground = "#ff7f7f";
         timeout = 0;
       };
-
-      #TODO: don't work
-      ghostie = {
-        appname = "Ghostie";
-        timeout = 10000; # ms
-      };
     };
   };
 
@@ -519,12 +512,42 @@ in {
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
-  home.file = {
-    #".config/dosomething/config.toml".source = /path/to/dosomething/config.toml;
-    #".config/dosomething/config.toml".text = ''
-    #  thing = 5
-    #'';
-  };
+  home.file = let
+    mkConf = path: source: {
+      ".config/${path}" = {
+        inherit source;
+      };
+    };
+    ini = config: {
+      generator = pkgs.formats.ini { };
+      inherit config;
+    };
+  in {
+    # ".config/gradle/gradle.properties".source = /path/to/file;
+    # ".config/gradle/gradle.properties".text = ''example text'';
+  } // ((a: lib.attrsets.concatMapAttrs (k: { generator, config, ... }: mkConf k (generator.generate (builtins.baseNameOf k) config)) a) {
+    "keepmenu/config.ini" = ini {
+      dmenu = {
+        dmenu_command = "rofi -i";
+      };
+
+      dmenu_passphrase = {
+        obscure = true;
+      };
+
+      database = let
+        entries = [
+          {
+            database = "~/KPXC/data.kdbx";
+            keyfile = "";
+          }
+        ];
+      in lib.lists.foldr (a: b: a // b) { } (lib.lists.imap1 (i: { database, keyfile, ... }: { "database_${builtins.toString i}" = database; "keyfile_${builtins.toString i}" = keyfile; }) entries) // {
+        pw_cache_period_min = 20;
+        autotype_default = "{USERNAME}{TAB}{PASSWORD}{ENTER}";
+      };
+    };
+  });
 
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. If you don't want to manage your shell through Home
