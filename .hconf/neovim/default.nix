@@ -1,12 +1,16 @@
 { config
 , pkgs }:
 
+#TODO: why doesn't friendly snippets work?
+#TODO: intellitab doesn't work, likely because of coq
+
 let
   mkRaw = config.lib.nixvim.mkRaw;
 in {
   enable = true;
   viAlias = true;
   vimAlias = true;
+  enableMan = true;
 
   nixpkgs.pkgs = pkgs;
 
@@ -38,6 +42,11 @@ in {
 
   keymaps = [
     {
+      key = "cs";
+      action = "<cmd>lua require'fastaction'.code_action()<CR>";
+      options.desc = "Opens the Code Action window";
+    }
+    {
       key = "<leader>g";
       action = "<cmd>XplrPicker %:p:h<CR>";
       options.desc = "Opens XPLR";
@@ -61,6 +70,16 @@ in {
       key = "<leader>q";
       action = "<cmd>BufferClose<CR>";
       options.desc = "Closes the current tab";
+    }
+    {
+      key = "<leader>Q";
+      action = "<cmd>BufferCloseAllButCurrent<CR>";
+      options.desc = "Closes all other tabs";
+    }
+    {
+      key = "<leader>EE";
+      action = "<cmd>execute \"bufdo w | BufferClose\" | q<CR>";
+      options.desc = "Saves everything open tab individually and then quits";
     }
     {
       key = "<leader>i";
@@ -130,8 +149,15 @@ in {
 
   autoCmd = [
     {
+      event = [ "BufWritePre" ];
+      callback = mkRaw ''
+        function()
+          pcall(vim.lsp.buf.format)
+        end
+      '';
+    }
+    {
       event = [ "BufWritePost" ];
-      pattern = [ "*.java" ];
       callback = mkRaw ''
         function()
           pcall(vim.lsp.codelens.refresh)
@@ -193,7 +219,11 @@ in {
     telescope.enable = true;
     intellitab.enable = true;
     inc-rename.enable = true;
-    
+    illuminate.enable = true;
+    comment.enable = true;
+    notify.enable = true;
+    friendly-snippets.enable = true;
+
     dap = {
       enable = true;
 
@@ -234,7 +264,6 @@ in {
           gr = "references";
           gi = "implementation";
           rn = "rename";
-          ca = "code_action";
           "<C-k>" = "signature_help";
         };
       };
@@ -350,17 +379,17 @@ in {
         #   enable = true;
         # };
 
-        # kotlin_language_server = {
-        #   enable = true;
-        #
-        #   settings = {
-        #     hints = {
-        #       typeHints = true;
-        #       parameterHints = true;
-        #       chaineHints = true;
-        #     };
-        #   };
-        # };
+        kotlin_language_server = {
+          enable = true;
+
+          settings = {
+            hints = {
+              typeHints = true;
+              parameterHints = true;
+              chaineHints = true;
+            };
+          };
+        };
 
         bashls = {
           enable = true;
@@ -538,6 +567,32 @@ in {
       };
     };
 
+    fastaction = {
+      enable = true;
+
+      settings = {
+        priority = {
+          java = [
+            {
+              key = "o";
+              order = 1;
+              pattern = "organize import";
+            }
+          ];
+        };
+      };
+    };
+    
+    luasnip = {
+      enable = true;
+
+      fromVscode = [
+        {
+          lazyLoad = false;
+        }
+      ];
+    };
+
     indent-blankline = {
       enable = true;
 
@@ -551,6 +606,13 @@ in {
           show_exact_scope = true;
           show_end = false;
         };
+
+        exclude = {
+          filetypes = [
+            "yaml"
+            "yml"
+          ];
+        };
       };
 
       luaConfig.post = ''
@@ -563,6 +625,7 @@ in {
             "RainbowViolet",
             "RainbowCyan",
         }
+
         local hooks = require "ibl.hooks"
         -- create the highlight groups in the highlight setup hook, so they are reset
         -- every time the colorscheme changes
