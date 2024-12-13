@@ -263,6 +263,11 @@ in {
           class = "firefox";
         }
       ];
+      "3" = [
+        {
+          class = "steam";
+        }
+      ];
       "9" = [
         {
           class = "FreeTube";

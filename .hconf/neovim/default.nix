@@ -14,10 +14,22 @@ in {
     number = true;
     relativenumber = true;
     expandtab = true;
+    smartcase = true;
+    incsearch = true;
+    breakindent = true;
+    list = true;
     showmode = false;
     shiftwidth = 4;
     tabstop = 4;
+    scrolloff = 8;
     clipboard = "unnamedplus";
+
+    listchars = {
+      multispace = "⋅";
+      trail = "•";
+      extends = "❯";
+      precedes = "❮";
+    };
   };
 
   globals = {
@@ -165,7 +177,6 @@ in {
     gitsigns.enable = true;
     gitignore.enable = true;
     compiler.enable = true;
-    autoclose.enable = true;
     lsp-lines.enable = true;
     lsp-signature.enable = true;
     specs.enable = true;
@@ -173,11 +184,15 @@ in {
     web-devicons.enable = true;
     nvim-surround.enable = true;
     treesitter.enable = true;
+    treesitter-context.enable = true;
     image.enable = true;
     direnv.enable = true;
     twilight.enable = true;
     rainbow-delimiters.enable = true;
     render-markdown.enable = true;
+    telescope.enable = true;
+    intellitab.enable = true;
+    inc-rename.enable = true;
     
     dap = {
       enable = true;
@@ -506,8 +521,66 @@ in {
       };
     };
 
-    telescope = {
+    autoclose = {
       enable = true;
+
+      keys = {
+        "(" = { escape = false; close = true; pair = "()"; };
+        "[" = { escape = false; close = true; pair = "[]"; };
+        "{" = { escape = false; close = true; pair = "{}"; };
+        "<" = { escape = false; close = true; pair = "<>"; };
+      };
+
+      options = {
+        autoIndent = true;
+        pairSpaces = true;
+        disableCommandMode = true;
+      };
+    };
+
+    indent-blankline = {
+      enable = true;
+
+      settings = {
+        whitespace = {
+          remove_blankline_trail = false;
+        };
+
+        scope = {
+          show_start = true;
+          show_exact_scope = true;
+          show_end = false;
+        };
+      };
+
+      luaConfig.post = ''
+        local highlight = {
+            "RainbowRed",
+            "RainbowYellow",
+            "RainbowBlue",
+            "RainbowOrange",
+            "RainbowGreen",
+            "RainbowViolet",
+            "RainbowCyan",
+        }
+        local hooks = require "ibl.hooks"
+        -- create the highlight groups in the highlight setup hook, so they are reset
+        -- every time the colorscheme changes
+        hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+            vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
+            vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
+            vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
+            vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
+            vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
+            vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+            vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
+        end)
+
+        vim.g.rainbow_delimiters = { highlight = highlight }
+        require("ibl").setup { scope = { highlight = highlight } }
+
+        hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
+      '';
     };
   };
 }
