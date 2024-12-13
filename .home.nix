@@ -109,8 +109,8 @@ in rec {
     (writeShellScriptBin "rec-sed" ''
       find ./ -type f -exec sed -i -e "$1" {} \;
     '')
-    (writeShellScriptBin "qmth" ''
-      printf "$@" | ${octave.out}/bin/octave
+    (writeShellScriptBin "mcdev-open-all" ''
+      nvim $(find src/main/java -type f) $(find src/client/java -type f)
     '')
     unstable.vesktop
     octave

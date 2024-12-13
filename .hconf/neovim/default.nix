@@ -2,7 +2,6 @@
 , pkgs }:
 
 #TODO: why doesn't friendly snippets work?
-#TODO: intellitab doesn't work, likely because of coq
 
 let
   mkRaw = config.lib.nixvim.mkRaw;
@@ -539,6 +538,7 @@ in {
       settings = {
         xdg = true;
         auto_start = "shut-up";
+        keymap.recommended = false;
       };
     };
 
