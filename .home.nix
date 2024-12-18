@@ -176,6 +176,7 @@ in rec {
     pistol
     ghostie
     ouch
+    ventoy-full
     obsidian
     #unstable.spotube
     #unstable.zed-editor

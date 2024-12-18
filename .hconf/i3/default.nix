@@ -35,7 +35,7 @@ in {
     mkMenu = args: "${config.programs.rofi.finalPackage}/bin/rofi ${args}";
     drun = mkMenu "-show drun -run-command \"i3-msg exec '{cmd}'\" -show-icons -sidebar-mode -application-fallback-icon ${./rofi-default-icon.png}";
     powermenu = mkMenu "-show power-menu -modi \"power-menu:rofi-power-menu --choices=logout/shutdown/reboot\"";
-    calc = mkMenu "-show calc -modi calc -no-show-match -no-sort -location 7";
+    calc = mkMenu "-show calc -modi calc -no-show-match -no-sort -location 7 -calc-command 'printf \"{result}\" | ${pkgs.xclip.out}/bin/xclip -i -selection CLIPBOARD'";
     file-browser = mkMenu "-show file-browser-extended";
     bluetooth = "rofi-bluetooth";
     keepmenu = "keepmenu";

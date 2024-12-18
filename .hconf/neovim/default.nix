@@ -149,6 +149,7 @@ in {
   autoCmd = [
     {
       event = [ "BufWritePre" ];
+      pattern = [ "*.java" ];
       callback = mkRaw ''
         function()
           pcall(vim.lsp.buf.format)
@@ -157,6 +158,7 @@ in {
     }
     {
       event = [ "BufWritePost" ];
+      pattern = [ "*.java" ];
       callback = mkRaw ''
         function()
           pcall(vim.lsp.codelens.refresh)
@@ -216,7 +218,7 @@ in {
     rainbow-delimiters.enable = true;
     render-markdown.enable = true;
     telescope.enable = true;
-    intellitab.enable = true;
+    # intellitab.enable = true;
     inc-rename.enable = true;
     illuminate.enable = true;
     comment.enable = true;
@@ -561,7 +563,6 @@ in {
       };
 
       options = {
-        autoIndent = true;
         pairSpaces = true;
         disableCommandMode = true;
       };
