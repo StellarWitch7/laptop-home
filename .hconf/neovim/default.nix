@@ -1,4 +1,5 @@
 { config
+, lib
 , pkgs }:
 
 #TODO: why doesn't friendly snippets work?
@@ -41,11 +42,6 @@ in {
 
   keymaps = [
     {
-      key = "cs";
-      action = "<cmd>lua require'fastaction'.code_action()<CR>";
-      options.desc = "Opens the Code Action window";
-    }
-    {
       key = "<leader>g";
       action = "<cmd>XplrPicker %:p:h<CR>";
       options.desc = "Opens XPLR";
@@ -79,6 +75,16 @@ in {
       key = "<leader>EE";
       action = "<cmd>execute \"bufdo w | BufferClose\" | q<CR>";
       options.desc = "Saves everything open tab individually and then quits";
+    }
+    {
+      key = "<leader>j";
+      action = "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR })<CR>";
+      options.desc = "Hop forwards";
+    }
+    {
+      key = "<leader>J";
+      action = "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR })<CR>";
+      options.desc = "Hop backwards";
     }
     {
       key = "<leader>i";
@@ -201,7 +207,6 @@ in {
     scope.enable = true;
     which-key.enable = true;
     hex.enable = true;
-    gitsigns.enable = true;
     gitignore.enable = true;
     compiler.enable = true;
     lsp-lines.enable = true;
@@ -210,18 +215,22 @@ in {
     barbar.enable = true;
     web-devicons.enable = true;
     nvim-surround.enable = true;
+    git-conflict.enable = true;
     treesitter.enable = true;
     treesitter-context.enable = true;
+    hop.enable = true;
     image.enable = true;
     direnv.enable = true;
     twilight.enable = true;
     rainbow-delimiters.enable = true;
     render-markdown.enable = true;
     telescope.enable = true;
-    # intellitab.enable = true;
+    intellitab.enable = true;
     inc-rename.enable = true;
     illuminate.enable = true;
     comment.enable = true;
+    dressing.enable = true;
+    neocord.enable = true;
     notify.enable = true;
     friendly-snippets.enable = true;
 
@@ -264,6 +273,7 @@ in {
           gd = "definition";
           gr = "references";
           gi = "implementation";
+          cs = "code_action";
           rn = "rename";
           "<C-k>" = "signature_help";
         };
@@ -555,35 +565,38 @@ in {
     autoclose = {
       enable = true;
 
-      keys = {
-        "(" = { escape = false; close = true; pair = "()"; };
-        "[" = { escape = false; close = true; pair = "[]"; };
-        "{" = { escape = false; close = true; pair = "{}"; };
-        "<" = { escape = false; close = true; pair = "<>"; };
-      };
-
       options = {
+        autoIndent = true;
         pairSpaces = true;
         disableCommandMode = true;
       };
     };
 
-    fastaction = {
+    hardtime = {
       enable = true;
 
       settings = {
-        priority = {
-          java = [
-            {
-              key = "o";
-              order = 1;
-              pattern = "organize import";
-            }
-          ];
+        max_time = 0;
+
+        disabled_keys = {
+          "<Down>" = mkRaw "{}";
+          "<Left>" = mkRaw "{}";
+          "<Right>" = mkRaw "{}";
+          "<Up>" = mkRaw "{}";
         };
       };
     };
-    
+
+    gitsigns = {
+      enable = true;
+
+      settings = {
+        current_line_blame = true;
+        current_line_blame_opts.virt_text_pos = "right_align";
+        diff_opts.algorithm = "minimal";
+      };
+    };
+
     luasnip = {
       enable = true;
 

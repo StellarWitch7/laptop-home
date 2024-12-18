@@ -411,7 +411,7 @@ in rec {
   };
 
   programs.nixvim = import (hconf + /neovim) {
-    inherit config pkgs;
+    inherit config lib pkgs;
   };
 
   services.ssh-agent = {
