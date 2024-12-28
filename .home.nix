@@ -266,6 +266,7 @@ in rec {
         contents = {
           commit.gpgsign = true;
           gpg.format = "ssh";
+          init.defaultBranch = "main";
 
           user = {
             name = "Aurora Dawn";
@@ -467,10 +468,10 @@ in rec {
   gtk = {
     enable = true;
 
-    catppuccin = {
-      enable = true;
-      icon.enable = true;
-    };
+    # catppuccin = {
+    #   enable = true;
+    #   icon.enable = true;
+    # };
 
     cursorTheme = {
       name = "Future-cyan-cursors";
