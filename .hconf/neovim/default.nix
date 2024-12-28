@@ -172,6 +172,11 @@ in {
       '';
     }
     {
+      event = [ "BufEnter" ];
+      pattern = [ "*.axaml" "*.xaml" ];
+      command = "set filetype=xml";
+    }
+    {
       event = [ "BufLeave" ];
       pattern = [ "term://*" ];
       command = "stopinsert";
@@ -386,9 +391,9 @@ in {
           };
         };
 
-        # omnisharp = {
-        #   enable = true;
-        # };
+        csharp_ls = {
+          enable = true;
+        };
 
         kotlin_language_server = {
           enable = true;

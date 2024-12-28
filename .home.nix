@@ -129,6 +129,7 @@ in rec {
     hunspell
     tree
     blockbench
+    thunderbird
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
