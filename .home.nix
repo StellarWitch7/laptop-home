@@ -55,6 +55,8 @@ in rec {
   catppuccin = {
     flavor = "mocha";
     accent = "mauve";
+
+    kitty.enable = true;
   };
 
   imports = [
@@ -152,7 +154,6 @@ in rec {
     picom
     dunst
     blueman
-    kitty
     linux-wifi-hotspot
     prismlauncher
     lxqt.lxqt-policykit
@@ -169,7 +170,6 @@ in rec {
     keepassxc
     hyfetch
     bruno
-    kitty-themes
     xdragon
     dua
     fzf
@@ -228,6 +228,10 @@ in rec {
       alias xcd="cd \$(xplr)"
       alias i2pbit="qbittorrent --configuration=I2Pprofile"
     '';
+  };
+
+  programs.kitty = {
+    enable = true;
   };
 
   programs.zoxide = {
