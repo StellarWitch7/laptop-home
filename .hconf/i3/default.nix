@@ -57,7 +57,6 @@ in {
       (mkAlways "${pbar-start.out}/bin/launch")
       (mkOnce "${sswitcher.out}/bin/sswitcher")
     ] ++ (with pkgs; [
-      (mkAlways "${autorandr.out}/bin/autorandr -c")
       (mkAlways "${feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg")
       #(mkAlways "${animated-bg.out}/bin/start")
       (mkAlways "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4")
@@ -67,6 +66,9 @@ in {
       (mkOnce "${flameshot.out}/bin/flameshot")
       (mkOnce "${networkmanagerapplet.out}/bin/nm-applet")
       (mkOnce "${sirikali.out}/bin/sirikali")
+      (mkOnce "${vesktop.out}/bin/vesktop")
+      (mkOnce "${heroic.out}/bin/heroic")
+      (mkOnce "${steam.out}/bin/steam")
       (mkOnce "${keepassxc.out}/bin/keepassxc")
       (mkOnce "${qbittorrent.out}/bin/qbittorrent")
       (mkOnce "${blueman.out}/bin/blueman-applet")
@@ -266,6 +268,9 @@ in {
       "3" = [
         {
           class = "steam";
+        }
+        {
+          class = "heroic";
         }
       ];
       "9" = [

@@ -126,6 +126,7 @@ in rec {
     r2modman
     simplescreenrecorder
     freetube
+    heroic
     firefox
     libreoffice
     hunspell
@@ -160,6 +161,7 @@ in rec {
     autorandr
     obs-studio
     with-shell
+    papirus-icon-theme
     networkmanagerapplet
     mindustry-server
     pavucontrol
@@ -226,7 +228,7 @@ in rec {
       alias nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
 
       alias xcd="cd \$(xplr)"
-      alias i2pbit="qbittorrent --configuration=I2Pprofile"
+      alias i2pbit="qbittorrent --configuration=I2P"
     '';
   };
 
@@ -265,21 +267,20 @@ in rec {
   };
 
   programs.git = {
-    includes = [
-      {
-        contents = {
-          commit.gpgsign = true;
-          gpg.format = "ssh";
-          init.defaultBranch = "main";
+    enable = true;
+    userName = "Aurora Dawn";
+    userEmail = "131844170+StellarWitch7@users.noreply.github.com";
 
-          user = {
-            name = "Aurora Dawn";
-            email = "131844170+StellarWitch7@users.noreply.github.com";
-            signingKey = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDa9q/hF/Ign0phm5I1ZZ+ZX3Xe2yk8OqNYOX4R8gWpMR6CctkrIoBAzriaTk4GAUpy1A0C450uAMiveEcuyMBZrO+eP9gHbSvauFcqkeA/xtm5rqyCKyFAoUpUcKfHQ/ZQWhCIA5taC9WbqPblLXIunZOgEaxRuc922GCMsp+p33dR1sAVrq2QyYQAZZEk53M1rOT1gtDCUyGnsdY7Huiuxlum+oeUWRGogkViww2FfGO4uGj0qbOHUKL5mrFewXZ3VqlIqxAh6p7cqEZV8jgGfprI4Tv6QRaCKKEGfRjZ66dIolRIDtZwoxyAxUf716ZqMHNCGhNRtnUYClDMIFh76K6EAAtuyCEmXoMOSKVrfzLVfXQD1K/DaqDnOjhz5digl1l8elLUdBmpa050u9/3j4XC8wOGljqJRNfsZQg112A/BVjoR+Iz+VAWHvcxRnK7+ZpEzX3CN14PAYsnNcZ4uXjsFeJDbPkUZFIt1y/3vdbahPKk7239wnDNiy4cjr8xsTeeMgeYHR6AY+NRRhpBADLpSaz9YI86xLcQXqM8GieWTWAHMLQfKda3c7Bjw8e6xgBMWxkNfPMBKb6bVxWEnb5gFarXLXLTLkKFf9LY02mNA1wdjP3IkbXHc1T7OXPIl9JIBvuEnCPq9TS4JgRPhtLUGKzlsj1knWUWOyVIGw== 131844170+StellarWitch7@users.noreply.github.com";
-          };
-        };
-      }
-    ];
+    signing = {
+      signByDefault = true;
+      key = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDa9q/hF/Ign0phm5I1ZZ+ZX3Xe2yk8OqNYOX4R8gWpMR6CctkrIoBAzriaTk4GAUpy1A0C450uAMiveEcuyMBZrO+eP9gHbSvauFcqkeA/xtm5rqyCKyFAoUpUcKfHQ/ZQWhCIA5taC9WbqPblLXIunZOgEaxRuc922GCMsp+p33dR1sAVrq2QyYQAZZEk53M1rOT1gtDCUyGnsdY7Huiuxlum+oeUWRGogkViww2FfGO4uGj0qbOHUKL5mrFewXZ3VqlIqxAh6p7cqEZV8jgGfprI4Tv6QRaCKKEGfRjZ66dIolRIDtZwoxyAxUf716ZqMHNCGhNRtnUYClDMIFh76K6EAAtuyCEmXoMOSKVrfzLVfXQD1K/DaqDnOjhz5digl1l8elLUdBmpa050u9/3j4XC8wOGljqJRNfsZQg112A/BVjoR+Iz+VAWHvcxRnK7+ZpEzX3CN14PAYsnNcZ4uXjsFeJDbPkUZFIt1y/3vdbahPKk7239wnDNiy4cjr8xsTeeMgeYHR6AY+NRRhpBADLpSaz9YI86xLcQXqM8GieWTWAHMLQfKda3c7Bjw8e6xgBMWxkNfPMBKb6bVxWEnb5gFarXLXLTLkKFf9LY02mNA1wdjP3IkbXHc1T7OXPIl9JIBvuEnCPq9TS4JgRPhtLUGKzlsj1knWUWOyVIGw== 131844170+StellarWitch7@users.noreply.github.com";
+    };
+
+    extraConfig = {
+      commit.gpgsign = true;
+      gpg.format = "ssh";
+      init.defaultBranch = "main";
+    };
   };
 
   programs.xplr = {
@@ -525,6 +526,10 @@ in rec {
         inherit source;
       };
     };
+    toml = config: {
+      generator = pkgs.formats.toml {  };
+      inherit config;
+    };
     ini = config: {
       generator = pkgs.formats.ini { };
       inherit config;
@@ -533,6 +538,12 @@ in rec {
     # ".config/gradle/gradle.properties".source = /path/to/file;
     # ".config/gradle/gradle.properties".text = ''example text'';
   } // ((a: lib.attrsets.concatMapAttrs (k: { generator, config, ... }: mkConf k (generator.generate (builtins.baseNameOf k) config)) a) {
+    "proton.conf" = toml rec {
+      data = "${dir}/.proton";
+      steam = "${dir}/.steam/root";
+      common = "${steam}/steamapps/common";
+    };
+
     "keepmenu/config.ini" = ini {
       dmenu = {
         dmenu_command = "rofi -i";
