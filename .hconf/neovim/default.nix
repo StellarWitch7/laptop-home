@@ -219,6 +219,8 @@ in {
     specs.enable = true;
     barbar.enable = true;
     web-devicons.enable = true;
+    hmts.enable = true;
+    lazygit.enable = true;
     nvim-surround.enable = true;
     git-conflict.enable = true;
     treesitter.enable = true;
@@ -559,6 +561,16 @@ in {
       };
     };
 
+    navbuddy = {
+      enable = true;
+      lsp.autoAttach = true;
+    };
+
+    muren = {
+      enable = true;
+      #TODO: probably needs configuring
+    };
+
     lightline = {
       enable = true;
 
@@ -634,7 +646,7 @@ in {
         };
       };
 
-      luaConfig.post = ''
+      luaConfig.post = /* lua */ ''
         local highlight = {
             "RainbowRed",
             "RainbowYellow",
