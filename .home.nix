@@ -479,12 +479,18 @@ in rec {
     #   icon.enable = true;
     # };
 
+    theme = {
+      name = "Catppuccin-Mocha-BL-MB";
+      package = pkgs.magnetic-catppuccin-gtk;
+    };
+
     cursorTheme = {
       name = "Future-cyan-cursors";
     };
 
     iconTheme = {
       name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
     };
 
     gtk2.extraConfig = ''
