@@ -129,6 +129,7 @@ in rec {
     heroic
     firefox
     libreoffice
+    lazygit
     hunspell
     tree
     blockbench
