@@ -57,6 +57,16 @@ in {
       options.desc = "Opens the Telescope text search";
     }
     {
+      key = "<leader>c";
+      action = "<cmd>LazyGit<CR>";
+      options.desc = "Opens lazygit";
+    }
+    {
+      key = "<leader>n";
+      action = "<cmd>Navbuddy<CR>";
+      options.desc = "Opens the symbol navigation window";
+    }
+    {
       key = "<leader>b";
       action = "<cmd>BufferPick<CR>";
       options.desc = "Opens the tab picker";
@@ -74,7 +84,7 @@ in {
     {
       key = "<leader>EE";
       action = "<cmd>execute \"bufdo w | BufferClose\" | q<CR>";
-      options.desc = "Saves everything open tab individually and then quits";
+      options.desc = "Saves all open tabs individually and then quits";
     }
     {
       key = "<leader>j";
@@ -148,6 +158,17 @@ in {
         "n"
         "t"
         "v"
+      ];
+    }
+    {
+      key = "<C-c>";
+      action = "<cmd>MurdenToggle<CR>";
+      options.desc = "Toggles the advanced find-and-replace window";
+
+      mode = [
+        "n"
+        "v"
+        "i"
       ];
     }
   ];
@@ -564,6 +585,7 @@ in {
     navbuddy = {
       enable = true;
       lsp.autoAttach = true;
+      #TODO: probably needs configuring
     };
 
     muren = {
