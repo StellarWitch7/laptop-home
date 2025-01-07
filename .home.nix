@@ -129,6 +129,7 @@ in rec {
     heroic
     firefox
     libreoffice
+    lazygit
     hunspell
     tree
     blockbench
@@ -478,12 +479,20 @@ in rec {
     #   icon.enable = true;
     # };
 
+    theme = {
+      name = "Catppuccin-GTK-Purple-Dark";
+      package = pkgs.magnetic-catppuccin-gtk.override {
+        accent = [ "purple" ];
+      };
+    };
+
     cursorTheme = {
       name = "Future-cyan-cursors";
     };
 
     iconTheme = {
       name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
     };
 
     gtk2.extraConfig = ''
