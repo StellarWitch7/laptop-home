@@ -585,7 +585,13 @@ in {
     navbuddy = {
       enable = true;
       lsp.autoAttach = true;
-      #TODO: probably needs configuring
+
+      mappings = {
+        "<DOWN>" = "next_sibling";
+        "<UP>" = "previous_sibling";
+        "<LEFT>" = "parent";
+        "<RIGHT>" = "children";
+      };
     };
 
     muren = {
