@@ -480,8 +480,10 @@ in rec {
     # };
 
     theme = {
-      name = "Catppuccin-Mocha-BL-MB";
-      package = pkgs.magnetic-catppuccin-gtk;
+      name = "Catppuccin-GTK-Purple-Dark";
+      package = pkgs.magnetic-catppuccin-gtk.override {
+        accent = [ "purple" ];
+      };
     };
 
     cursorTheme = {
