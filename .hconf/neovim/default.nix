@@ -42,6 +42,22 @@ in {
 
   keymaps = [
     {
+      key = "o"; #TODO: this isn't working with Shift+o, it does the normal Shift+o behaviour rah
+      action = "k";
+    }
+    {
+      key = "k";
+      action = "h";
+    }
+    {
+      key = "l";
+      action = "j";
+    }
+    {
+      key = ";";
+      action = "l";
+    }
+    {
       key = "<leader>g";
       action = "<cmd>XplrPicker %:p:h<CR>";
       options.desc = "Opens XPLR";
@@ -275,6 +291,8 @@ in {
       keymaps = {
         diagnostic = {
           "<leader>d" = "open_float";
+          "<leader>s" = "goto_next";
+          "<leader>w" = "goto_prev";
         };
         lspBuf = {
           gd = "definition";
