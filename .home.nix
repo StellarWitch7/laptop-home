@@ -474,11 +474,6 @@ in rec {
   gtk = {
     enable = true;
 
-    # catppuccin = {
-    #   enable = true;
-    #   icon.enable = true;
-    # };
-
     theme = {
       name = "Catppuccin-GTK-Purple-Dark";
       package = pkgs.magnetic-catppuccin-gtk.override {
