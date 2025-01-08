@@ -162,7 +162,7 @@ in {
     }
     {
       key = "<C-c>";
-      action = "<cmd>MurdenToggle<CR>";
+      action = "<cmd>MurenToggle<CR>";
       options.desc = "Toggles the advanced find-and-replace window";
 
       mode = [
