@@ -127,6 +127,8 @@ in rec {
     simplescreenrecorder
     freetube
     heroic
+    cookiecutter
+    zip
     firefox
     libreoffice
     lazygit
@@ -213,6 +215,7 @@ in rec {
       bind '"\e[A":history-search-backward'
       bind '"\e[B":history-search-forward'
 
+      alias :q='exit'
       alias ls='ls -lav --color=auto --ignore=..'
       alias l='ls -lav --color=auto --ignore=.. | grep '
       alias pacdiff=eos-pacdiff
