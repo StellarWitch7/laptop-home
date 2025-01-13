@@ -13,14 +13,37 @@
 , screenshot-gui }:
 
 let
-  animated-bg = pkgs.stdenv.mkDerivation {
+  i3-video-wallpaper = pkgs.stdenv.mkDerivation {
+    name = "i3-video-wallpaper";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "Zolyn";
+      repo = "i3-video-wallpaper";
+      rev = "69b6e6e02929edc5ee2b93c5c4f7542a752385ea";
+      hash = "sha256-A3+B8FOoPC8bbAcG2pmO07dVsTjtqVkJKAptSs0k9ns=";
+    };
+
+    buildInputs = with pkgs; [
+      imagemagick
+      xdotool
+      xwinwrap
+      mpv
+      feh
+    ];
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp setup.sh $out/bin/i3-video-wallpaper
+      chmod +x $out/bin/i3-video-wallpaper
+    '';
+  };
+  video-bg = pkgs.stdenv.mkDerivation {
     name = "i3-bg";
     src = ./.;
 
     installPhase = ''
       mkdir -p $out/bin
-      ${aurpkgs.i3-animated-wallpaper.out}/bin/i3-wp-generate ${./bg.gif} $out/bg
-      printf "\#!/usr/bin/env bash\n\n${aurpkgs.i3-animated-wallpaper.out}/bin/i3-wp-loop $out/bg \"0.1\"" >$out/bin/start
+      printf "\#!/usr/bin/env bash\n\n${i3-video-wallpaper}/bin/i3-video-wallpaper -bawn ${./bg.mp4}" >$out/bin/start
       chmod +x $out/bin/start
     '';
   };
@@ -57,8 +80,8 @@ in {
       (mkAlways "${pbar-start.out}/bin/launch")
       (mkOnce "${sswitcher.out}/bin/sswitcher")
     ] ++ (with pkgs; [
-      (mkAlways "${feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg")
-      #(mkAlways "${animated-bg.out}/bin/start")
+      # (mkAlways "${feh.out}/bin/feh --no-fehbg --bg-scale ${dir}/.bg")
+      (mkAlways "${video-bg.out}/bin/start")
       (mkAlways "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4")
       (mkOnce "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent")
       (mkOnce "${picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}")

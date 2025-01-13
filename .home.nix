@@ -63,6 +63,7 @@ in rec {
     /etc/nixos/default-home.nix
     (builtins.fetchGit {
       url = "https://github.com/catppuccin/nix";
+      rev = "8eada392fd6571a747e1c5fc358dd61c14c8704e";
     } + /modules/home-manager)
     (import (builtins.fetchGit {
       url = "https://github.com/nix-community/nixvim";
@@ -499,10 +500,28 @@ in rec {
 
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
+
+      # extraCss = ''
+      #   menu,
+      #   .csd .menu,
+      #   .csd .dropdown,
+      #   .csd .context-menu {
+      #       border-radius: 1px;
+      #   }
+      # '';
     };
 
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = true;
+
+      # extraCss = ''
+      #   menu,
+      #   .csd .menu,
+      #   .csd .dropdown,
+      #   .csd .context-menu {
+      #       border-radius: 1px;
+      #   }
+      # '';
     };
   };
 
