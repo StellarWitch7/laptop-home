@@ -13,7 +13,7 @@
 , screenshot-gui }:
 
 let
-  i3-video-wallpaper = pkgs.stdenv.mkDerivation {
+  i3-video-wallpaper = pkgs.stdenv.mkDerivation rec {
     name = "i3-video-wallpaper";
 
     src = pkgs.fetchFromGitHub {
@@ -25,16 +25,27 @@ let
 
     buildInputs = with pkgs; [
       imagemagick
+      coreutils-full
+      xorg.xrandr
+      gnugrep
       xdotool
       xwinwrap
       mpv
       feh
+      ps
+    ];
+
+    nativeBuildInputs = with pkgs; [
+      makeWrapper
     ];
 
     installPhase = ''
       mkdir -p $out/bin
       cp setup.sh $out/bin/i3-video-wallpaper
-      chmod +x $out/bin/i3-video-wallpaper
+    '';
+
+    postFixup = ''
+      wrapProgram $out/bin/i3-video-wallpaper --set PATH ${lib.makeBinPath buildInputs}
     '';
   };
   video-bg = pkgs.stdenv.mkDerivation {
