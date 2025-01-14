@@ -274,11 +274,11 @@ in rec {
   programs.git = {
     enable = true;
     userName = "Aurora Dawn";
-    userEmail = "131844170+StellarWitch7@users.noreply.github.com";
+    userEmail = "aurora.dawn@trans.fish";
 
     signing = {
       signByDefault = true;
-      key = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDa9q/hF/Ign0phm5I1ZZ+ZX3Xe2yk8OqNYOX4R8gWpMR6CctkrIoBAzriaTk4GAUpy1A0C450uAMiveEcuyMBZrO+eP9gHbSvauFcqkeA/xtm5rqyCKyFAoUpUcKfHQ/ZQWhCIA5taC9WbqPblLXIunZOgEaxRuc922GCMsp+p33dR1sAVrq2QyYQAZZEk53M1rOT1gtDCUyGnsdY7Huiuxlum+oeUWRGogkViww2FfGO4uGj0qbOHUKL5mrFewXZ3VqlIqxAh6p7cqEZV8jgGfprI4Tv6QRaCKKEGfRjZ66dIolRIDtZwoxyAxUf716ZqMHNCGhNRtnUYClDMIFh76K6EAAtuyCEmXoMOSKVrfzLVfXQD1K/DaqDnOjhz5digl1l8elLUdBmpa050u9/3j4XC8wOGljqJRNfsZQg112A/BVjoR+Iz+VAWHvcxRnK7+ZpEzX3CN14PAYsnNcZ4uXjsFeJDbPkUZFIt1y/3vdbahPKk7239wnDNiy4cjr8xsTeeMgeYHR6AY+NRRhpBADLpSaz9YI86xLcQXqM8GieWTWAHMLQfKda3c7Bjw8e6xgBMWxkNfPMBKb6bVxWEnb5gFarXLXLTLkKFf9LY02mNA1wdjP3IkbXHc1T7OXPIl9JIBvuEnCPq9TS4JgRPhtLUGKzlsj1knWUWOyVIGw== 131844170+StellarWitch7@users.noreply.github.com";
+      key = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbnFrhuMF23UthGvx5cwpOpwl2gCvTq5eRyOSdofCP1V9MzQbkhE+y1CtuOO1jbv+m0iADCFey9AJEy2Vgr8j/w4O3maKRw9LVLKD/DFGPjRfApTWJ8IXy/2C3/VOui5Tm4UWPB2Taw1Gm1WAgvxdq6zPZ+7R5Mn5FpuvNPmi6EUBQBpZm4VEAST+GnYe0cy4und3Cgc5yrGfNG5XgmNBiwYn02LHBwdBXo0aq1jqc9tCsBfNeDWMjyyqDxVQAI3UJcXTNT9qnwWCmx/DxGembgi44TpVTmsjDo8CIRbQtoZRfww1bQGcvLREcxMauAWICzwvRFbsrUw0+A3r6l8jhHb0keyBCE7mcPZsIimQ7kMgsFb3kdERnDGTyVAfUvGqgXlT60OxqCsgmlcY/ppeElD+Fm9aLmDaeHpiavpbzzaggcihG6SI7AtTEPf7YOFxeC6bb07HDL37DUjqKywDYTN6MicIO4IsKCQR8Cp0u4vk6t5C+GR3vJQ01ge7uszX2P8rDhErtwsedNfPFrWGaPErGzmDZiXaAsDk5++YhrAYfkpw5QjGhWS3p9/91YP5k3fR4P6p9GQIok6zZIxBaqBEukBcvB6yy/JHf5J87Dvb/sSA32cQNa7lGx7XQx6nM2lc81eI7MDJfpxjn/06UyciY2G4dXurbLTSPvW0tZQ== aurora.dawn@trans.fish";
     };
 
     extraConfig = {
