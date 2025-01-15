@@ -117,6 +117,7 @@ in rec {
     '')
     unstable.vesktop
     octave
+    libqalculate
     firefox
     handbrake
     vlc
