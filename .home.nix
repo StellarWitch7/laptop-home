@@ -138,6 +138,7 @@ in rec {
     tree
     blockbench
     thunderbird
+    birdtray # for thunderbird to support system tray
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
@@ -562,6 +563,7 @@ in rec {
       inherit config;
     };
   in {
+    ".thunderbird_link_because_birdtray_stupid".source = "${pkgs.thunderbird.out}/bin/thunderbird";
     # ".config/gradle/gradle.properties".source = /path/to/file;
     # ".config/gradle/gradle.properties".text = ''example text'';
   } // ((a: lib.attrsets.concatMapAttrs (k: { generator, config, ... }: mkConf k (generator.generate (builtins.baseNameOf k) config)) a) {

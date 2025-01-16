@@ -103,6 +103,7 @@ in {
       (mkOnce "${vesktop.out}/bin/vesktop")
       (mkOnce "${heroic.out}/bin/heroic")
       (mkOnce "${steam.out}/bin/steam")
+      (mkOnce "${birdtray.out}/bin/birdtray")
       (mkOnce "${keepassxc.out}/bin/keepassxc")
       (mkOnce "${qbittorrent.out}/bin/qbittorrent")
       (mkOnce "${blueman.out}/bin/blueman-applet")
