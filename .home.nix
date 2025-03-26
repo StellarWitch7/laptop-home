@@ -76,22 +76,12 @@ in rec {
   home.packages = [
     sswitcher
   ] ++ (with aurpkgs; [
-    git-nixed
-    vault
-    bar
-    #ImageSorter # broken
   ]) ++ (with pinnedPkgs; [
-    aseprite
-    krita
-    ffmpeg
   ]) ++ (with pkgs; [
     (writeShellScriptBin "recon-gdrive" ''
       ${rclone.out}/bin/rclone config reconnect AuraGDrive:
       nohup ${rclone.out}/bin/rclone mount AuraGDrive: ~/CloudData/AuraGDrive &
     '')
-    # (writeShellScriptBin "cs-fmt" ''
-    #   nix-shell -p dotnet-sdk csharpier --run "dotnet-csharpier $@"
-    # '')
     (writeShellScriptBin "hotspot" ''
       pkexec --user root ${linux-wifi-hotspot.out}/bin/create_ap wlan0 wlan0 "solanix" "$1" --mkconfig /etc/create_ap.conf -g 1.1.1.1
     '')
@@ -112,67 +102,40 @@ in rec {
     (writeShellScriptBin "rec-sed" ''
       find ./ -type f -exec sed -i -e "$1" {} \;
     '')
-    (writeShellScriptBin "mcdev-open-all" ''
-      nvim $(find src/main/java -type f) $(find src/client/java -type f)
-    '')
     unstable.vesktop
     octave
     libqalculate
     firefox
-    handbrake
     vlc
     audacity
-    gitnr
-    calibre
     zathura
-    r2modman
     simplescreenrecorder
     freetube
-    heroic
-    cookiecutter
-    zip
-    firefox
     libreoffice
     lazygit
     hunspell
     tree
-    blockbench
     thunderbird
     birdtray # for thunderbird to support system tray
     git
     gitAndTools.gh
     hunspellDicts.en_GB-ise
     hunspellDicts.tok
-    airshipper
     fzf
-    itch
     yt-dlp
-    osu-lazer-bin
-    the-powder-toy
-    celeste64
     bottom
-    sirikali
     flameshot
-    qbittorrent
     pandoc
-    openrgb
     rclone
-    bespokesynth
-    picom
-    dunst
     blueman
     linux-wifi-hotspot
-    prismlauncher
     lxqt.lxqt-policykit
-    autorandr
-    obs-studio
     with-shell
     papirus-icon-theme
     networkmanagerapplet
     mindustry-server
     pavucontrol
     nix-output-monitor
-    invidtui
     xclip
     glances
     keepassxc
@@ -180,15 +143,10 @@ in rec {
     bruno
     xdragon
     dua
-    fzf
     trash-cli
     pistol
-    ghostie
     ouch
-    ventoy-full
     obsidian
-    #unstable.spotube
-    #unstable.zed-editor
   ]) ++ programs.rofi.plugins;
 
   xsession = {

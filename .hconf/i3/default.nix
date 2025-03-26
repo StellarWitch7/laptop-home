@@ -96,19 +96,12 @@ in {
       (mkAlways "${kitti3.out}/bin/kitti3 -n caterwaul -p CC -s 0.4 0.4")
       (mkOnce "${lxqt.lxqt-policykit.out}/bin/lxqt-policykit-agent")
       (mkOnce "${picom.out}/bin/picom -cbf --config ${hconf + /picom/picom.conf}")
-      (mkOnce "${openrgb.out}/bin/openrgb --startminimized --profile \"Trans-Purple\"")
       (mkOnce "${flameshot.out}/bin/flameshot")
       (mkOnce "${networkmanagerapplet.out}/bin/nm-applet")
-      (mkOnce "${sirikali.out}/bin/sirikali")
-      (mkOnce "${vesktop.out}/bin/vesktop")
-      (mkOnce "${heroic.out}/bin/heroic")
-      (mkOnce "${steam.out}/bin/steam")
       (mkOnce "${birdtray.out}/bin/birdtray")
       (mkOnce "${keepassxc.out}/bin/keepassxc")
-      (mkOnce "${qbittorrent.out}/bin/qbittorrent")
       (mkOnce "${blueman.out}/bin/blueman-applet")
       (mkOnce "${warpd.out}/bin/warpd --config ${hconf + /warpd/warpd.conf}")
-      (mkOnce "${ghostie.out}/bin/ghostie start")
       (mkOnce "${rclone.out}/bin/rclone mount AuraGDrive: ${dir}/CloudData/AuraGDrive")
     ]);
 
@@ -141,7 +134,7 @@ in {
       "${mod}+l" = "exec --no-startup-id ${lock}";
 
       # reload monitor config with autorandr
-      "${mod}+z" = "exec --no-startup-id ${pkgs.autorandr.out}/bin/autorandr -c";
+      # "${mod}+z" = "exec --no-startup-id ${pkgs.autorandr.out}/bin/autorandr -c";
 
       # modify audio settings
       "${mod}+k" = mkAudioCtrl "set-sink-volume @DEFAULT_SINK@ +10%";
@@ -210,24 +203,7 @@ in {
 
       # powermenu
       "${mod}+BackSpace" = "exec ${powermenu}";
-      # "${mod}+BackSpace" = "mode \"powermenu\"";
     } // mkWorkspaceFocus 9 // mkWorkspaceMove 9;
-
-    modes = {
-      # powermenu = {
-      #   "l" = "exec ${lock}, mode \"default\"";
-      #   "s" = "exec ${lock}, exec sleep 10 && systemctl sleep, mode \"default\"";
-      #   "h" = "exec ${lock}, exec sleep 10 && systemctl hibernate, mode \"default\"";
-      #   "e" = "exec i3-msg exit, mode \"default\"";
-      #   "r" = "exec systemctl reboot, mode \"default\"";
-      #   "Shift+s" = "exec systemctl poweroff -i, mode \"default\"";
-      #
-      #   # back to normal: Enter, Escape, or Backspace
-      #   "Return" = "mode \"default\"";
-      #   "Escape" = "mode \"default\"";
-      #   "BackSpace" = "mode \"default\"";
-      # };
-    };
 
     floating = {
       titlebar = true;
